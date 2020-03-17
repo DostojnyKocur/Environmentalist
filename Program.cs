@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Environmentalist.Services.DiskService;
+using Environmentalist.Services.EnvWriter;
 using Environmentalist.Services.TemplateReader;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -23,8 +24,10 @@ namespace Environmentalist
             RegisterServices();
 
             var templateReader = _serviceProvider.GetService<ITemplateReader>();
+            var envWriter = _serviceProvider.GetService<IEnvWriter>();
 
-            await templateReader.Read(args[0]);
+            var template = await templateReader.Read(args[0]);
+            await envWriter.Write(template, args[1]);
 
             Log.Logger.Information("Terminating application");
 
@@ -38,6 +41,7 @@ namespace Environmentalist
 
             builder.RegisterType<DiskService>().As<IDiskService>();
             builder.RegisterType<TemplateReader>().As<ITemplateReader>();
+            builder.RegisterType<EnvWriter>().As<IEnvWriter>();
 
             builder.Populate(collection);
             var appContainer = builder.Build();
