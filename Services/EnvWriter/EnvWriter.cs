@@ -19,6 +19,7 @@ namespace Environmentalist.Services.EnvWriter
         public async Task Write(TemplateModel model, string path)
         {
             StringValidator.IsNullOrWhitespace(path, nameof(path));
+            ObjectValidator.IsNull(model, nameof(model));
 
             var fileContent = new StringBuilder();
             foreach(var keyValue in model.Fields)

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using Environmentalist.Validators;
 
 namespace Environmentalist.Services.DiskService
 {
@@ -7,6 +8,8 @@ namespace Environmentalist.Services.DiskService
     {
         public async Task<string> ReadFileText(string path)
         {
+            StringValidator.IsNullOrWhitespace(path, nameof(path));
+
             using (var reader = File.OpenText(path))
             {
                 var fileText = await reader.ReadToEndAsync();
@@ -16,6 +19,9 @@ namespace Environmentalist.Services.DiskService
 
         public async Task WriteFileText(string content, string path)
         {
+            StringValidator.IsNullOrWhitespace(path, nameof(path));
+            StringValidator.IsNullOrWhitespace(content, nameof(content));
+
             using (var writer = File.CreateText(path))
             {
                 await writer.WriteAsync(content);
