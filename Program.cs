@@ -24,16 +24,23 @@ namespace Environmentalist
 
             RegisterServices();
 
-            var logicProcessor = _serviceProvider.GetService<ILogicProcessor>();
-            var templateReader = _serviceProvider.GetService<ITemplateReader>();
-            var envWriter = _serviceProvider.GetService<IEnvWriter>();
+            try
+            {
+                var logicProcessor = _serviceProvider.GetService<ILogicProcessor>();
+                var templateReader = _serviceProvider.GetService<ITemplateReader>();
+                var envWriter = _serviceProvider.GetService<IEnvWriter>();
 
-            var template = await templateReader.Read(args[0]);
-            var config = await templateReader.Read(args[1]);
+                var template = await templateReader.Read(args[0]);
+                var config = await templateReader.Read(args[1]);
 
-            var output = logicProcessor.Process(template, config);
+                var output = logicProcessor.Process(template, config);
 
-            await envWriter.Write(output, args[2]);
+                await envWriter.Write(output, args[2]);
+            }
+            catch(Exception exception)
+            {
+                Log.Logger.Error(exception, "An error occured");
+            }
 
             Log.Logger.Information("Terminating application");
 
@@ -67,12 +74,8 @@ namespace Environmentalist
 
         private static void DisposeServices()
         {
-            if (_serviceProvider == null)
-            {
-                return;
-            }
-            if (_serviceProvider is IDisposable)
-            {
+            if (!(_serviceProvider is null) && (_serviceProvider is IDisposable))
+            { 
                 ((IDisposable)_serviceProvider).Dispose();
             }
         }

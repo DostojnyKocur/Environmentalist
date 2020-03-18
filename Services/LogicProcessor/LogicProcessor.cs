@@ -1,5 +1,6 @@
 ﻿using Environmentalist.Models;
 using Environmentalist.Validators;
+using Serilog;
 
 namespace Environmentalist.Services.LogicProcessor
 {
@@ -18,6 +19,8 @@ namespace Environmentalist.Services.LogicProcessor
                 var value = config.Fields.ContainsKey(templateLine.Value) ? config.Fields[templateLine.Value] : templateLine.Value;
 
                 resultModel.Fields.Add(key, value);
+
+                Log.Logger.Debug($"Bounded key: '{key}' to value '{value}'");
             }
 
             return resultModel;
