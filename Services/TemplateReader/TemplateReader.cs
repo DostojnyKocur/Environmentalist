@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Environmentalist.Models;
 using Environmentalist.Services.DiskService;
-using Environmentalist.Template;
 using Environmentalist.Validators;
 
 namespace Environmentalist.Services.TemplateReader

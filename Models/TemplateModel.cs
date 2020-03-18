@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Environmentalist.Template
+namespace Environmentalist.Models
 {
 	internal sealed class TemplateModel
 	{

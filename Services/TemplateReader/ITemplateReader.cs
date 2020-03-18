@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Environmentalist.Template;
+using Environmentalist.Models;
 
 namespace Environmentalist.Services.TemplateReader
 {
