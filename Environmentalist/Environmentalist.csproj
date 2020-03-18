@@ -17,6 +17,7 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="2.0.0" />
     <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="System.IO.Abstractions" Version="9.0.5" />
   </ItemGroup>
 
 </Project>

@@ -2,11 +2,11 @@
 
 namespace Environmentalist.Validators
 {
-    internal static class ObjectValidator
+    public class StringValidator
     {
-        public static void IsNull(object @object, string paramName)
+        public static void IsNullOrWhitespace(string @string, string paramName)
         {
-            if(@object is null)
+            if(string.IsNullOrWhiteSpace(@string))
             {
                 throw new ArgumentNullException(paramName);
             }

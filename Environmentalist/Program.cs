@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -6,6 +7,7 @@ using Environmentalist.Services.DiskService;
 using Environmentalist.Services.EnvWriter;
 using Environmentalist.Services.LogicProcessor;
 using Environmentalist.Services.TemplateReader;
+using Environmentalist.Validators.FileValidator;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
@@ -51,6 +53,10 @@ namespace Environmentalist
         {
             var collection = new ServiceCollection();
             var builder = new ContainerBuilder();
+
+            builder.RegisterType<FileSystem>().As<IFileSystem>();
+
+            builder.RegisterType<FileValidator>().As<IFileValidator>();
 
             builder.RegisterType<DiskService>().As<IDiskService>();
             builder.RegisterType<TemplateReader>().As<ITemplateReader>();

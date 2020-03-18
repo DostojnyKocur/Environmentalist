@@ -8,3 +8,9 @@
 /Properties
 *.env
 *.txt
+/EnvironmentalistTests/bin
+/EnvironmentalistTests/obj
+/Environmentalist/.vs
+/Environmentalist/bin
+/Environmentalist/obj
+/Environmentalist/Properties
