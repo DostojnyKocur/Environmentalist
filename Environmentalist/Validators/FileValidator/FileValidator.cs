@@ -3,7 +3,7 @@ using System.IO.Abstractions;
 
 namespace Environmentalist.Validators.FileValidator
 {
-    public class FileValidator : IFileValidator
+    public sealed class FileValidator : IFileValidator
     {
         private IFileSystem _fileSystem;
 

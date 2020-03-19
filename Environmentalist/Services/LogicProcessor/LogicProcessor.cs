@@ -1,15 +1,22 @@
 ﻿using Environmentalist.Models;
-using Environmentalist.Validators;
+using Environmentalist.Validators.ObjectValidator;
 using Serilog;
 
 namespace Environmentalist.Services.LogicProcessor
 {
-    internal sealed class LogicProcessor : ILogicProcessor
+    public sealed class LogicProcessor : ILogicProcessor
     {
+        private readonly IObjectValidator _objectValidator;
+
+        public LogicProcessor(IObjectValidator objectValidator)
+        {
+            _objectValidator = objectValidator;
+        }
+
         public TemplateModel Process(TemplateModel template, TemplateModel config)
         {
-            ObjectValidator.IsNull(template, nameof(template));
-            ObjectValidator.IsNull(config, nameof(config));
+            _objectValidator.IsNull(template, nameof(template));
+            _objectValidator.IsNull(config, nameof(config));
 
             var resultModel = new TemplateModel();
 

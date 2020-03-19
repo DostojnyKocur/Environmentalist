@@ -3,27 +3,30 @@ using System.Linq;
 using System.Threading.Tasks;
 using Environmentalist.Models;
 using Environmentalist.Services.DiskService;
-using Environmentalist.Validators;
 using Environmentalist.Validators.FileValidator;
+using Environmentalist.Validators.StringValidator;
 
 namespace Environmentalist.Services.TemplateReader
 {
-	internal sealed class TemplateReader : ITemplateReader
+	public sealed class TemplateReader : ITemplateReader
 	{
 		private readonly IDiskService _diskService;
 		private readonly IFileValidator _fileValidator;
+		private readonly IStringValidator _stringValidator;
 
 		public TemplateReader(
 			IDiskService diskService,
-			IFileValidator fileValidator)
+			IFileValidator fileValidator,
+			IStringValidator stringValidator)
 		{
 			_diskService = diskService;
 			_fileValidator = fileValidator;
+			_stringValidator = stringValidator;
 		}
 
 		public async Task<TemplateModel> Read(string path)
 		{
-			StringValidator.IsNullOrWhitespace(path, nameof(path));
+			_stringValidator.IsNullOrWhitespace(path, nameof(path));
 			_fileValidator.IsExist(path);
 
 			var fileContent = await _diskService.ReadFileText(path);

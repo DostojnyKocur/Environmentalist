@@ -3,23 +3,31 @@ using System.Text;
 using System.Threading.Tasks;
 using Environmentalist.Models;
 using Environmentalist.Services.DiskService;
-using Environmentalist.Validators;
+using Environmentalist.Validators.ObjectValidator;
+using Environmentalist.Validators.StringValidator;
 
 namespace Environmentalist.Services.EnvWriter
 {
-    internal sealed class EnvWriter : IEnvWriter
+    public sealed class EnvWriter : IEnvWriter
     {
         private readonly IDiskService _diskService;
+        private readonly IStringValidator _stringValidator;
+        private readonly IObjectValidator _objectValidator;
 
-        public EnvWriter(IDiskService diskService)
+        public EnvWriter(
+            IDiskService diskService,
+            IStringValidator stringValidator,
+            IObjectValidator objectValidator)
         {
             _diskService = diskService;
+            _stringValidator = stringValidator;
+            _objectValidator = objectValidator;
         }
 
         public async Task Write(TemplateModel model, string path)
         {
-            StringValidator.IsNullOrWhitespace(path, nameof(path));
-            ObjectValidator.IsNull(model, nameof(model));
+            _stringValidator.IsNullOrWhitespace(path, nameof(path));
+            _objectValidator.IsNull(model, nameof(model));
 
             var fileContent = new StringBuilder();
             foreach(var keyValue in model.Fields)

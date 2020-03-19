@@ -3,7 +3,7 @@ using Environmentalist.Models;
 
 namespace Environmentalist.Services.TemplateReader
 {
-	internal interface ITemplateReader
+	public interface ITemplateReader
 	{
 		Task<TemplateModel> Read(string path);
 	}

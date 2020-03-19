@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace Environmentalist.Validators
+namespace Environmentalist.Validators.ObjectValidator
 {
-    public class ObjectValidator
+    public sealed class ObjectValidator : IObjectValidator
     {
-        public static void IsNull(object @object, string paramName)
+        public void IsNull(object @object, string paramName)
         {
             if(@object is null)
             {

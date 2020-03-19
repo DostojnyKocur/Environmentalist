@@ -8,6 +8,8 @@ using Environmentalist.Services.EnvWriter;
 using Environmentalist.Services.LogicProcessor;
 using Environmentalist.Services.TemplateReader;
 using Environmentalist.Validators.FileValidator;
+using Environmentalist.Validators.ObjectValidator;
+using Environmentalist.Validators.StringValidator;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
@@ -57,6 +59,8 @@ namespace Environmentalist
             builder.RegisterType<FileSystem>().As<IFileSystem>();
 
             builder.RegisterType<FileValidator>().As<IFileValidator>();
+            builder.RegisterType<ObjectValidator>().As<IObjectValidator>();
+            builder.RegisterType<StringValidator>().As<IStringValidator>();
 
             builder.RegisterType<DiskService>().As<IDiskService>();
             builder.RegisterType<TemplateReader>().As<ITemplateReader>();

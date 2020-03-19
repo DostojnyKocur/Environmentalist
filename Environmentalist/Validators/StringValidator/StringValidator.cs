@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace Environmentalist.Validators
+namespace Environmentalist.Validators.StringValidator
 {
-    public class StringValidator
+    public sealed class StringValidator : IStringValidator
     {
-        public static void IsNullOrWhitespace(string @string, string paramName)
+        public void IsNullOrWhitespace(string @string, string paramName)
         {
             if(string.IsNullOrWhiteSpace(@string))
             {
