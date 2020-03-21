@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using Environmentalist.Models;
 
 namespace Environmentalist.Services.KeePassReader
 {
     public interface IKeePassReader
     {
-        Dictionary<string, string> ReadDatabase(string databasePath, string masterPassword);
+        ICollection<SecretEntryModel> ReadDatabase(string databasePath, string masterPassword);
     }
 }

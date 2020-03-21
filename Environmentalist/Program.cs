@@ -51,7 +51,7 @@ namespace Environmentalist
                     var kdbx = reader.ReadDatabase(configuration.SecureVaultPath, configuration.SecureVaultPass);
 
                     var logicProcessor = _serviceProvider.GetService<ILogicProcessor>();
-                    var output = logicProcessor.Process(template, config);
+                    var output = logicProcessor.Process(template, config, kdbx);
 
                     var envWriter = _serviceProvider.GetService<IEnvWriter>();
                     await envWriter.Write(output, configuration.ResultPath);
