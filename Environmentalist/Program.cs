@@ -5,6 +5,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Environmentalist.Services.DiskService;
 using Environmentalist.Services.EnvWriter;
+using Environmentalist.Services.KeePassReader;
 using Environmentalist.Services.LogicProcessor;
 using Environmentalist.Services.TemplateReader;
 using Environmentalist.Validators.FileValidator;
@@ -30,6 +31,9 @@ namespace Environmentalist
 
             try
             {
+                var reader = _serviceProvider.GetService<IKeePassReader>();
+                var kdbx = reader.ReadDatabase(args[3], args[4]);
+
                 var logicProcessor = _serviceProvider.GetService<ILogicProcessor>();
                 var templateReader = _serviceProvider.GetService<ITemplateReader>();
                 var envWriter = _serviceProvider.GetService<IEnvWriter>();
@@ -64,6 +68,7 @@ namespace Environmentalist
 
             builder.RegisterType<DiskService>().As<IDiskService>();
             builder.RegisterType<TemplateReader>().As<ITemplateReader>();
+            builder.RegisterType<KeePassReader>().As<IKeePassReader>();
             builder.RegisterType<EnvWriter>().As<IEnvWriter>();
             builder.RegisterType<LogicProcessor>().As<ILogicProcessor>();
 
