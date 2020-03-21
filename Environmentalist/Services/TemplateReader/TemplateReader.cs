@@ -39,7 +39,7 @@ namespace Environmentalist.Services.TemplateReader
 				if (!string.IsNullOrWhiteSpace(line))
 				{
 					var keyValue = line.Split('=');
-					result.Fields.Add(keyValue[0], keyValue[1]);
+					result.Fields.Add(keyValue[0].Trim(), keyValue[1].Trim());
 				}
 			});
 

@@ -3,6 +3,7 @@ using System.IO.Abstractions;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Environmentalist.Services.ConfigurationReader;
 using Environmentalist.Services.DiskService;
 using Environmentalist.Services.EnvWriter;
 using Environmentalist.Services.KeePassReader;
@@ -19,38 +20,49 @@ namespace Environmentalist
 {
     class Program
     {
+        private const string Usage = @"Usage: Environmentalist <path to config file .conf>";
         private static IServiceProvider _serviceProvider;
 
         static async Task Main(string[] args)
         {
             CreateLogger();
 
-            Log.Logger.Information("Starting application");
+            Log.Logger.Debug("Starting application");
 
             RegisterServices();
 
-            try
+            if (args.Length == 0)
             {
-                var reader = _serviceProvider.GetService<IKeePassReader>();
-                var kdbx = reader.ReadDatabase(args[3], args[4]);
-
-                var logicProcessor = _serviceProvider.GetService<ILogicProcessor>();
-                var templateReader = _serviceProvider.GetService<ITemplateReader>();
-                var envWriter = _serviceProvider.GetService<IEnvWriter>();
-
-                var template = await templateReader.Read(args[0]);
-                var config = await templateReader.Read(args[1]);
-
-                var output = logicProcessor.Process(template, config);
-
-                await envWriter.Write(output, args[2]);
+                Log.Logger.Information(Usage);
             }
-            catch(Exception exception)
+            else
             {
-                Log.Logger.Error(exception, "An error occured");
+                try
+                {
+                    var configFilePath = args[0];
+                    var configReader = _serviceProvider.GetService<IConfigurationReader>();
+                    var configuration = await configReader.Read(configFilePath);
+
+                    var templateReader = _serviceProvider.GetService<ITemplateReader>();
+                    var template = await templateReader.Read(configuration.TemplatePath);
+                    var config = await templateReader.Read(configuration.ConfigPath);
+
+                    var reader = _serviceProvider.GetService<IKeePassReader>();
+                    var kdbx = reader.ReadDatabase(configuration.SecureVaultPath, configuration.SecureVaultPass);
+
+                    var logicProcessor = _serviceProvider.GetService<ILogicProcessor>();
+                    var output = logicProcessor.Process(template, config);
+
+                    var envWriter = _serviceProvider.GetService<IEnvWriter>();
+                    await envWriter.Write(output, configuration.ResultPath);
+                }
+                catch (Exception exception)
+                {
+                    Log.Logger.Error(exception, "During processing an error occured");
+                }
             }
 
-            Log.Logger.Information("Terminating application");
+            Log.Logger.Debug("Terminating application");
 
             DisposeServices();
         }
@@ -60,17 +72,20 @@ namespace Environmentalist
             var collection = new ServiceCollection();
             var builder = new ContainerBuilder();
 
-            builder.RegisterType<FileSystem>().As<IFileSystem>();
+            builder.RegisterType<FileSystem>().As<IFileSystem>().SingleInstance();
 
-            builder.RegisterType<FileValidator>().As<IFileValidator>();
-            builder.RegisterType<ObjectValidator>().As<IObjectValidator>();
-            builder.RegisterType<StringValidator>().As<IStringValidator>();
+            builder.RegisterType<FileValidator>().As<IFileValidator>().SingleInstance();
+            builder.RegisterType<ObjectValidator>().As<IObjectValidator>().SingleInstance();
+            builder.RegisterType<StringValidator>().As<IStringValidator>().SingleInstance();
 
-            builder.RegisterType<DiskService>().As<IDiskService>();
-            builder.RegisterType<TemplateReader>().As<ITemplateReader>();
-            builder.RegisterType<KeePassReader>().As<IKeePassReader>();
-            builder.RegisterType<EnvWriter>().As<IEnvWriter>();
-            builder.RegisterType<LogicProcessor>().As<ILogicProcessor>();
+            builder.RegisterType<DiskService>().As<IDiskService>().SingleInstance();
+
+            builder.RegisterType<TemplateReader>().As<ITemplateReader>().SingleInstance();
+            builder.RegisterType<KeePassReader>().As<IKeePassReader>().SingleInstance();
+            _ = builder.RegisterType<ConfigurationReader>().As<IConfigurationReader>().SingleInstance();
+
+            builder.RegisterType<EnvWriter>().As<IEnvWriter>().SingleInstance();
+            builder.RegisterType<LogicProcessor>().As<ILogicProcessor>().SingleInstance();
 
             builder.Populate(collection);
             var appContainer = builder.Build();

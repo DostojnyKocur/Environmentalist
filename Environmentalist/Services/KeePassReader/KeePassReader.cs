@@ -7,7 +7,7 @@ using Serilog;
 
 namespace Environmentalist.Services.KeePassReader
 {
-    public class KeePassReader : IKeePassReader
+    public sealed class KeePassReader : IKeePassReader
     {
         public Dictionary<string, string> ReadDatabase(string databasePath, string masterPassword)
         {
