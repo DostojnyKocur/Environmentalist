@@ -5,6 +5,6 @@ namespace Environmentalist.Services.LogicProcessor
 {
     public interface ILogicProcessor
     {
-        TemplateModel Process(TemplateModel template, TemplateModel config, ICollection<SecretEntryModel> secrets);
+        TemplateModel Process(TemplateModel template, TemplateModel config, IDictionary<string, string> environmentVariables, ICollection<SecretEntryModel> secrets);
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Environmentalist.Services.ConfigurationReader;
 using Environmentalist.Services.DiskService;
+using Environmentalist.Services.EnvironmentVariableReader;
 using Environmentalist.Services.EnvWriter;
 using Environmentalist.Services.KeePassReader;
 using Environmentalist.Services.LogicProcessor;
@@ -42,16 +44,25 @@ namespace Environmentalist
                     var configFilePath = args[0];
                     var configReader = _serviceProvider.GetService<IConfigurationReader>();
                     var configuration = await configReader.Read(configFilePath);
+                    var configurationEnvVariables = configReader.ExtractEnvironmentVariables(configuration);
+
+                    var envVariablesReader = _serviceProvider.GetService<IEnvironmentVariableReader>();
+                    var configEnvVariablesValues = envVariablesReader.Read(configurationEnvVariables);
+                    configuration = configReader.ProcessEnvironmentVariables(configuration, configEnvVariablesValues);
 
                     var templateReader = _serviceProvider.GetService<ITemplateReader>();
                     var template = await templateReader.Read(configuration.TemplatePath);
                     var config = await templateReader.Read(configuration.ConfigPath);
+                    var templateEnvVariables = templateReader.ExtractEnvironmentVariables(template);
+                    var configEnvVariables = templateReader.ExtractEnvironmentVariables(config);
+                    var envVariables = templateEnvVariables.Concat(configEnvVariables).ToList();
+                    var envVariablesValues = envVariablesReader.Read(envVariables);
 
                     var reader = _serviceProvider.GetService<IKeePassReader>();
                     var kdbx = reader.ReadDatabase(configuration.SecureVaultPath, configuration.SecureVaultPass);
 
                     var logicProcessor = _serviceProvider.GetService<ILogicProcessor>();
-                    var output = logicProcessor.Process(template, config, kdbx);
+                    var output = logicProcessor.Process(template, config, envVariablesValues, kdbx);
 
                     var envWriter = _serviceProvider.GetService<IEnvWriter>();
                     await envWriter.Write(output, configuration.ResultPath);
@@ -82,7 +93,8 @@ namespace Environmentalist
 
             builder.RegisterType<TemplateReader>().As<ITemplateReader>().SingleInstance();
             builder.RegisterType<KeePassReader>().As<IKeePassReader>().SingleInstance();
-            _ = builder.RegisterType<ConfigurationReader>().As<IConfigurationReader>().SingleInstance();
+            builder.RegisterType<ConfigurationReader>().As<IConfigurationReader>().SingleInstance();
+            builder.RegisterType<EnvironmentVariableReader>().As<IEnvironmentVariableReader>().SingleInstance();
 
             builder.RegisterType<EnvWriter>().As<IEnvWriter>().SingleInstance();
             builder.RegisterType<LogicProcessor>().As<ILogicProcessor>().SingleInstance();

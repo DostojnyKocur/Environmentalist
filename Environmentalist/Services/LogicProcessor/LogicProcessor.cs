@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Environmentalist.Extensions;
 using Environmentalist.Models;
 using Environmentalist.Validators.ObjectValidator;
 using Serilog;
@@ -16,10 +17,11 @@ namespace Environmentalist.Services.LogicProcessor
             _objectValidator = objectValidator;
         }
 
-        public TemplateModel Process(TemplateModel template, TemplateModel config, ICollection<SecretEntryModel> secrets)
+        public TemplateModel Process(TemplateModel template, TemplateModel config, IDictionary<string, string> environmentVariables, ICollection<SecretEntryModel> secrets)
         {
             _objectValidator.IsNull(template, nameof(template));
             _objectValidator.IsNull(config, nameof(config));
+            _objectValidator.IsNull(environmentVariables, nameof(environmentVariables));
             _objectValidator.IsNull(secrets, nameof(secrets));
 
             var resultModel = new TemplateModel();
@@ -30,7 +32,8 @@ namespace Environmentalist.Services.LogicProcessor
                 {
                     var key = templateLine.Key;
                     var value = config.Fields.ContainsKey(templateLine.Value) ? config.Fields[templateLine.Value] : templateLine.Value;
-                    value = TryReturnsSecret(value, secrets);
+
+                    value = TryGetCustomValue(value, environmentVariables, secrets);
 
                     resultModel.Fields.Add(key, value);
 
@@ -46,13 +49,22 @@ namespace Environmentalist.Services.LogicProcessor
             return resultModel;
         }
 
-        private static string TryReturnsSecret(string value, ICollection<SecretEntryModel> secrets)
+        private static string TryGetCustomValue(string value, IDictionary<string, string> environmentVariables, ICollection<SecretEntryModel> secrets)
         {
-            if (!value.StartsWith("[KeePass]"))
+            if (value.StartsWith(Consts.KeePassTagName))
             {
-                return value;
+                return TryReturnsSecret(value, secrets);
+            }
+            else if (value.StartsWith(Consts.EnvironmentalVariableTagName))
+            {
+                return TryReturnEnvironmentVariable(value, environmentVariables);
             }
 
+            return value;
+        }
+
+        private static string TryReturnsSecret(string value, ICollection<SecretEntryModel> secrets)
+        {
             if (!secrets.Any())
             {
                 throw new InvalidOperationException("No secrets found");
@@ -60,7 +72,7 @@ namespace Environmentalist.Services.LogicProcessor
 
             try
             {
-                var secretType = value.Split('(', ')')[1];
+                var secretType = value.GetBetweenParentheses();
                 var secret = secrets.First(entry => entry.Title.Equals(secretType) || entry.UserName.Equals(secretType));
                 return secret.Password;
             }
@@ -72,6 +84,31 @@ namespace Environmentalist.Services.LogicProcessor
             catch (InvalidOperationException exception)
             {
                 Log.Logger.Error(exception, $"Secret '{value}' has not been found");
+                throw;
+            }
+        }
+
+        private static string TryReturnEnvironmentVariable(string value, IDictionary<string, string> environmentVariables)
+        {
+            if (!environmentVariables.Any())
+            {
+                throw new InvalidOperationException("No environment variables values found");
+            }
+
+            try
+            {
+                var environmentVariableName = value.GetBetweenParentheses();
+                var environmentVariableValue = environmentVariables[environmentVariableName];
+                return environmentVariableValue;
+            }
+            catch (IndexOutOfRangeException exception)
+            {
+                Log.Logger.Error(exception, $"During parsing configuration value '{value}' an error has been occured");
+                throw;
+            }
+            catch (KeyNotFoundException exception)
+            {
+                Log.Logger.Error(exception, $"Environment variable value for '{value}' has not been found");
                 throw;
             }
         }

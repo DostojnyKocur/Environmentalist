@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Environmentalist.Extensions;
 using Environmentalist.Models;
 using Environmentalist.Services.DiskService;
 using Environmentalist.Validators.FileValidator;
@@ -44,6 +46,16 @@ namespace Environmentalist.Services.TemplateReader
 			});
 
 			return result;
+		}
+
+		public ICollection<string> ExtractEnvironmentVariables(TemplateModel model)
+		{
+			var foundEnvironmentVariables = model.Fields
+				.Where(keyPair => keyPair.Value.StartsWith(Consts.EnvironmentalVariableTagName))
+				.Select(keyPair => keyPair.Value.GetBetweenParentheses())
+				.ToList();
+
+			return foundEnvironmentVariables;
 		}
 	}
 }
