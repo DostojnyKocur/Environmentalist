@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using Environmentalist.Validators;
 using Environmentalist.Validators.FileValidator;
 using NUnit.Framework;
 

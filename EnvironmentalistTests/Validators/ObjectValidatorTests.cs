@@ -4,6 +4,7 @@ using NUnit.Framework;
 
 namespace EnvironmentalistTests.Validators
 {
+    [TestFixture]
     public class ObjectValidatorTests
     {
         private IObjectValidator _sut;
