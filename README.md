@@ -21,7 +21,7 @@ templatePath=template.env
 resultPath=result.env
 configPath=conf1.txt
 secureVaultPath=secrets.kdbx
-secureVaultPass=password
+secureVaultPass=[EnvVar](SecureVaultPass)
 ```
 
 `templatePath` is a path to a template which is taken as a source of output file.
@@ -29,6 +29,8 @@ secureVaultPass=password
 `configPath` is a path to a configuration file. The configuration file describes how to fill templates with values.
 `secureVaultPath` is a path to a KeePass database file.
 `secureVaultPass` is password to a KeePass database file.
+
+The tool supports reading environment variables. `[EnvVar](SecureVaultPass)` means that during parsing configuration value of environment variable `SecureVaultPass` will be used in this place.
 
 #### template
 

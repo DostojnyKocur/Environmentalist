@@ -54,6 +54,8 @@ namespace Environmentalist.Services.ConfigurationReader
 
         public ICollection<string> ExtractEnvironmentVariables(ConfigurationModel model)
         {
+            _objectValidator.IsNull(model, nameof(model));
+
             var foundEnvironmentVariables = new List<string>();
                 
             if(model.TemplatePath.StartsWith(Consts.EnvironmentalVariableTagName))
@@ -82,6 +84,7 @@ namespace Environmentalist.Services.ConfigurationReader
 
         public ConfigurationModel ProcessEnvironmentVariables(ConfigurationModel configuration, IDictionary<string, string> environmentVariables)
         {
+            _objectValidator.IsNull(configuration, nameof(configuration));
             _objectValidator.IsNull(environmentVariables, nameof(environmentVariables));
 
             var newConfiguration = new ConfigurationModel
