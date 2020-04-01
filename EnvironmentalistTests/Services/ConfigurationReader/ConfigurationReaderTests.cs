@@ -17,39 +17,39 @@ namespace EnvironmentalistTests.Services.ConfigurationReader
     [TestFixture]
     public class ConfigurationReaderTests
     {
-        public const string Path = "testpath";
-        public const string TemplatePath = "template.env";
-        public const string ResultPath = "result.env";
-        public const string ConfigPath = "conf.txt";
-        public const string SecureVaultPath = "keepass.kdbx";
-        public const string SecureVaultPass = "pass";
+        private const string Path = "testpath";
+        private const string TemplatePath = "template.env";
+        private const string ResultPath = "result.env";
+        private const string ConfigPath = "conf.txt";
+        private const string SecureVaultPath = "keepass.kdbx";
+        private const string SecureVaultPass = "pass";
 
-        public const string TemplatePathVarName = "template";
-        public const string ResultPathVarName = "result";
-        public const string ConfigPathVarName = "conf";
-        public const string SecureVaultPathVarName = "keepass";
-        public const string SecureVaultPassVarName = "pass";
+        private const string TemplatePathVarName = "template";
+        private const string ResultPathVarName = "result";
+        private const string ConfigPathVarName = "conf";
+        private const string SecureVaultPathVarName = "keepass";
+        private const string SecureVaultPassVarName = "pass";
 
-        public const string TemplatePathVarValue = nameof(TemplatePathVarValue);
-        public const string ResultPathVarValue = nameof(ResultPathVarValue);
-        public const string ConfigPathVarValue = nameof(ConfigPathVarValue);
-        public const string SecureVaultPathVarValue = nameof(SecureVaultPathVarValue);
-        public const string SecureVaultPassVarValue = nameof(SecureVaultPassVarValue);
+        private const string TemplatePathVarValue = nameof(TemplatePathVarValue);
+        private const string ResultPathVarValue = nameof(ResultPathVarValue);
+        private const string ConfigPathVarValue = nameof(ConfigPathVarValue);
+        private const string SecureVaultPathVarValue = nameof(SecureVaultPathVarValue);
+        private const string SecureVaultPassVarValue = nameof(SecureVaultPassVarValue);
 
-        public static readonly string TemplatePathVarLine = $"[EnvVar]({TemplatePathVarName})";
-        public static readonly string ResultPathVarLine = $"[EnvVar]({ResultPathVarName})";
-        public static readonly string ConfigPathVarLine = $"[EnvVar]({ConfigPathVarName})";
-        public static readonly string SecureVaultPathVarLine = $"[EnvVar]({SecureVaultPathVarName})";
-        public static readonly string SecureVaultPassVarLine = $"[EnvVar]({SecureVaultPassVarName})";
+        private static readonly string TemplatePathVarLine = $"[EnvVar]({TemplatePathVarName})";
+        private static readonly string ResultPathVarLine = $"[EnvVar]({ResultPathVarName})";
+        private static readonly string ConfigPathVarLine = $"[EnvVar]({ConfigPathVarName})";
+        private static readonly string SecureVaultPathVarLine = $"[EnvVar]({SecureVaultPathVarName})";
+        private static readonly string SecureVaultPassVarLine = $"[EnvVar]({SecureVaultPassVarName})";
 
-        public static readonly string BasicValidConfigFile = @$"
+        private static readonly string BasicValidConfigFile = @$"
                                     templatePath={TemplatePath}
                                     resultPath={ResultPath}
                                     configPath={ConfigPath}
                                     secureVaultPath={SecureVaultPath}
                                     secureVaultPass={SecureVaultPass}";
 
-        public static readonly Dictionary<string, string> EnvVarValues = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> EnvVarValues = new Dictionary<string, string>
         {
             { TemplatePathVarName, TemplatePathVarValue },
             { ResultPathVarName, ResultPathVarValue },
@@ -58,7 +58,7 @@ namespace EnvironmentalistTests.Services.ConfigurationReader
             { SecureVaultPassVarName, SecureVaultPassVarValue },
         };
 
-        public static readonly ConfigurationModel EnvVarConfigurationModel = new ConfigurationModel
+        private static readonly ConfigurationModel EnvVarConfigurationModel = new ConfigurationModel
         {
             TemplatePath = TemplatePathVarLine,
             ResultPath = ResultPathVarLine,
