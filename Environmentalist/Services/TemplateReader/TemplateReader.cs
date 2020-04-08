@@ -6,6 +6,7 @@ using Environmentalist.Extensions;
 using Environmentalist.Models;
 using Environmentalist.Services.DiskService;
 using Environmentalist.Validators.FileValidator;
+using Environmentalist.Validators.ObjectValidator;
 using Environmentalist.Validators.StringValidator;
 
 namespace Environmentalist.Services.TemplateReader
@@ -15,15 +16,18 @@ namespace Environmentalist.Services.TemplateReader
 		private readonly IDiskService _diskService;
 		private readonly IFileValidator _fileValidator;
 		private readonly IStringValidator _stringValidator;
+		private readonly IObjectValidator _objectValidator;
 
 		public TemplateReader(
 			IDiskService diskService,
 			IFileValidator fileValidator,
-			IStringValidator stringValidator)
+			IStringValidator stringValidator,
+			IObjectValidator objectValidator)
 		{
 			_diskService = diskService;
 			_fileValidator = fileValidator;
 			_stringValidator = stringValidator;
+			_objectValidator = objectValidator;
 		}
 
 		public async Task<TemplateModel> Read(string path)
@@ -50,6 +54,8 @@ namespace Environmentalist.Services.TemplateReader
 
 		public ICollection<string> ExtractEnvironmentVariables(TemplateModel model)
 		{
+			_objectValidator.IsNull(model, nameof(model));
+
 			var foundEnvironmentVariables = model.Fields
 				.Where(keyPair => keyPair.Value.StartsWith(Consts.EnvironmentalVariableTagName))
 				.Select(keyPair => keyPair.Value.GetBetweenParentheses())

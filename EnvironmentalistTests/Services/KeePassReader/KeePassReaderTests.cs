@@ -1,10 +1,10 @@
-﻿using Environmentalist.Services.KeePassReader;
+﻿using System;
+using System.IO;
+using Environmentalist.Services.KeePassReader;
 using Environmentalist.Validators.FileValidator;
 using Environmentalist.Validators.StringValidator;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.IO;
 
 namespace EnvironmentalistTests.Services.KeePassReader
 {
