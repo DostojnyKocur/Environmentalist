@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Environmentalist.Models;
+using Environmentalist.Validators.FileValidator;
+using Environmentalist.Validators.StringValidator;
 using KeePassLib.Keys;
 using KeePassLib.Serialization;
 using Serilog;
@@ -10,8 +12,23 @@ namespace Environmentalist.Services.KeePassReader
 {
     public sealed class KeePassReader : IKeePassReader
     {
+        private readonly IFileValidator _fileValidator;
+        private readonly IStringValidator _stringValidator;
+
+        public KeePassReader(
+            IFileValidator fileValidator,
+            IStringValidator stringValidator)
+        {
+            _fileValidator = fileValidator;
+            _stringValidator = stringValidator;
+        }
+
         public ICollection<SecretEntryModel> ReadDatabase(string databasePath, string masterPassword)
         {
+            _stringValidator.IsNullOrWhitespace(databasePath, nameof(databasePath));
+            _stringValidator.IsNullOrWhitespace(masterPassword, nameof(masterPassword));
+            _fileValidator.IsExist(databasePath);
+
             //How to read KeePass database taken from https://stackoverflow.com/a/9028433
 
             var result = default(ICollection<SecretEntryModel>);

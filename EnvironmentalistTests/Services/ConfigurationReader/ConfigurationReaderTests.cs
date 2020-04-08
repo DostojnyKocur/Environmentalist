@@ -105,7 +105,7 @@ namespace EnvironmentalistTests.Services.ConfigurationReader
         [Test]
         public void When_read_And_path_is_invalid_Then_throws_argument_null_exception()
         {
-            _stringValidatorMock.Setup(m => m.IsNullOrWhitespace(It.IsAny<string>(), It.IsAny<string>())).Throws(new ArgumentNullException());
+            _stringValidatorMock.Setup(m => m.IsNullOrWhitespace(null, It.IsAny<string>())).Throws(new ArgumentNullException());
 
             Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Read(null));
         }
@@ -134,7 +134,7 @@ namespace EnvironmentalistTests.Services.ConfigurationReader
         [Test]
         public void When_extract_environment_variables_And_parameter_is_null_Then_throws_argument_null_exception()
         {
-            _objectValidatorMock.Setup(m => m.IsNull(It.IsAny<object>(), It.IsAny<string>())).Throws(new ArgumentNullException());
+            _objectValidatorMock.Setup(m => m.IsNull(null, It.IsAny<string>())).Throws(new ArgumentNullException());
 
             Assert.Throws<ArgumentNullException>(() => _sut.ExtractEnvironmentVariables(null));
         }
@@ -154,7 +154,7 @@ namespace EnvironmentalistTests.Services.ConfigurationReader
         [Test]
         public void When_process_environment_variables_And_configuration_is_null_Then_throws_argument_null_exception()
         {
-            _objectValidatorMock.Setup(m => m.IsNull(It.IsAny<object>(), It.IsAny<string>())).Throws(new ArgumentNullException());
+            _objectValidatorMock.Setup(m => m.IsNull(null, It.IsAny<string>())).Throws(new ArgumentNullException());
 
             Assert.Throws<ArgumentNullException>(() => _sut.ProcessEnvironmentVariables(null, EnvVarValues));
         }
@@ -162,7 +162,7 @@ namespace EnvironmentalistTests.Services.ConfigurationReader
         [Test]
         public void When_process_environment_variables_And_environment_variables_dictionary_is_null_Then_throws_argument_null_exception()
         {
-            _objectValidatorMock.Setup(m => m.IsNull(It.IsAny<object>(), It.IsAny<string>())).Throws(new ArgumentNullException());
+            _objectValidatorMock.Setup(m => m.IsNull(null, It.IsAny<string>())).Throws(new ArgumentNullException());
 
             Assert.Throws<ArgumentNullException>(() => _sut.ProcessEnvironmentVariables(EnvVarConfigurationModel, null));
         }
