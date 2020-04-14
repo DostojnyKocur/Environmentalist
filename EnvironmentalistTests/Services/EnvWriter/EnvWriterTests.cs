@@ -21,7 +21,7 @@ namespace EnvironmentalistTests.Services.EnvWriter
 
         private Mock<IDiskService> _dickServiceModk;
         private Mock<IStringValidator> _stringValidatorMock;
-        private Mock<IObjectValidator> _objectValidator;
+        private Mock<IObjectValidator> _objectValidatorMock;
         private IEnvWriter _sut;
 
         [SetUp]
@@ -29,12 +29,12 @@ namespace EnvironmentalistTests.Services.EnvWriter
         {
             _dickServiceModk = new Mock<IDiskService>();
             _stringValidatorMock = new Mock<IStringValidator>();
-            _objectValidator = new Mock<IObjectValidator>();
+            _objectValidatorMock = new Mock<IObjectValidator>();
 
             _sut = new Environmentalist.Services.EnvWriter.EnvWriter(
                 _dickServiceModk.Object,
                 _stringValidatorMock.Object,
-                _objectValidator.Object);
+                _objectValidatorMock.Object);
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace EnvironmentalistTests.Services.EnvWriter
         [Test]
         public void When_write_And_model_is_null_Then_throws_argument_null_exception()
         {
-            _objectValidator.Setup(m => m.IsNull(null, It.IsAny<string>())).Throws(new ArgumentNullException());
+            _objectValidatorMock.Setup(m => m.IsNull(null, It.IsAny<string>())).Throws(new ArgumentNullException());
             var model = PrepareTemplateModel();
 
             Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Write(null, Path));
