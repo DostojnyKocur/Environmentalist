@@ -19,14 +19,14 @@ This file describes input and output.
 ```
 templatePath=template.env
 resultPath=result.env
-configPath=conf1.txt
+profilePath=profile1.txt
 secureVaultPath=secrets.kdbx
 secureVaultPass=[EnvVar](SecureVaultPass)
 ```
 
 `templatePath` is a path to a template which is taken as a source of output file.
 `resultPath` is a path to an output file. This file will be created based on the template and configuration.
-`configPath` is a path to a configuration file. The configuration file describes how to fill templates with values.
+`profilePath` is a path to a profile file. The profile file describes how to fill templates with values.
 `secureVaultPath` is a path to a KeePass database file.
 `secureVaultPass` is password to a KeePass database file.
 
@@ -51,7 +51,7 @@ KEY4=VALUE4
 
 `[KeePass](test_entry)` means that output file will be filled with a password from KeePass for entry `test_entry`. Valid formulas are title of entry or username in entry.
 
-#### config
+#### profile
 
 The file has the same structure as `template`.
 Values from this file are copied to template file and evaluated.

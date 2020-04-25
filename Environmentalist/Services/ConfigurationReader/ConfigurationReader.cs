@@ -66,9 +66,9 @@ namespace Environmentalist.Services.ConfigurationReader
             {
                 foundEnvironmentVariables.Add(model.ResultPath.GetBetweenParentheses());
             }
-            if (model.ConfigPath.StartsWith(Consts.EnvironmentalVariableTagName))
+            if (model.ProfilePath.StartsWith(Consts.EnvironmentalVariableTagName))
             {
-                foundEnvironmentVariables.Add(model.ConfigPath.GetBetweenParentheses());
+                foundEnvironmentVariables.Add(model.ProfilePath.GetBetweenParentheses());
             }
             if (model.SecureVaultPath.StartsWith(Consts.EnvironmentalVariableTagName))
             {
@@ -91,7 +91,7 @@ namespace Environmentalist.Services.ConfigurationReader
             {
                 TemplatePath = TryGetEnvironmentVariableValue(configuration.TemplatePath, environmentVariables),
                 ResultPath = TryGetEnvironmentVariableValue(configuration.ResultPath, environmentVariables),
-                ConfigPath = TryGetEnvironmentVariableValue(configuration.ConfigPath, environmentVariables),
+                ProfilePath = TryGetEnvironmentVariableValue(configuration.ProfilePath, environmentVariables),
                 SecureVaultPath = TryGetEnvironmentVariableValue(configuration.SecureVaultPath, environmentVariables),
                 SecureVaultPass = TryGetEnvironmentVariableValue(configuration.SecureVaultPass, environmentVariables),
             };
@@ -138,8 +138,8 @@ namespace Environmentalist.Services.ConfigurationReader
                 case "resultpath":
                     config.ResultPath = value;
                     break;
-                case "configpath":
-                    config.ConfigPath = value;
+                case "profilepath":
+                    config.ProfilePath = value;
                     break;
                 case "securevaultpath":
                     config.SecureVaultPath = value;

@@ -52,9 +52,9 @@ namespace Environmentalist
 
                     var templateReader = _serviceProvider.GetService<ITemplateReader>();
                     var template = await templateReader.Read(configuration.TemplatePath);
-                    var config = await templateReader.Read(configuration.ConfigPath);
+                    var profile = await templateReader.Read(configuration.ProfilePath);
                     var templateEnvVariables = templateReader.ExtractEnvironmentVariables(template);
-                    var configEnvVariables = templateReader.ExtractEnvironmentVariables(config);
+                    var configEnvVariables = templateReader.ExtractEnvironmentVariables(profile);
                     var envVariables = templateEnvVariables.Concat(configEnvVariables).ToList();
                     var envVariablesValues = envVariablesReader.Read(envVariables);
 
@@ -62,7 +62,7 @@ namespace Environmentalist
                     var kdbx = reader.ReadDatabase(configuration.SecureVaultPath, configuration.SecureVaultPass);
 
                     var logicProcessor = _serviceProvider.GetService<ILogicProcessor>();
-                    var output = logicProcessor.Process(template, config, envVariablesValues, kdbx);
+                    var output = logicProcessor.Process(template, profile, envVariablesValues, kdbx);
 
                     var envWriter = _serviceProvider.GetService<IEnvWriter>();
                     await envWriter.Write(output, configuration.ResultPath);

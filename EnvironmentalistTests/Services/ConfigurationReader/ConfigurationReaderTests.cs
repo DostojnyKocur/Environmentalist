@@ -20,32 +20,32 @@ namespace EnvironmentalistTests.Services.ConfigurationReader
         private const string Path = "testpath";
         private const string TemplatePath = "template.env";
         private const string ResultPath = "result.env";
-        private const string ConfigPath = "conf.txt";
+        private const string ProfilePath = "profile.txt";
         private const string SecureVaultPath = "keepass.kdbx";
         private const string SecureVaultPass = "pass";
 
         private const string TemplatePathVarName = "template";
         private const string ResultPathVarName = "result";
-        private const string ConfigPathVarName = "conf";
+        private const string ProfilePathVarName = "conf";
         private const string SecureVaultPathVarName = "keepass";
         private const string SecureVaultPassVarName = "pass";
 
         private const string TemplatePathVarValue = nameof(TemplatePathVarValue);
         private const string ResultPathVarValue = nameof(ResultPathVarValue);
-        private const string ConfigPathVarValue = nameof(ConfigPathVarValue);
+        private const string ProfilePathVarValue = nameof(ProfilePathVarValue);
         private const string SecureVaultPathVarValue = nameof(SecureVaultPathVarValue);
         private const string SecureVaultPassVarValue = nameof(SecureVaultPassVarValue);
 
         private static readonly string TemplatePathVarLine = $"[EnvVar]({TemplatePathVarName})";
         private static readonly string ResultPathVarLine = $"[EnvVar]({ResultPathVarName})";
-        private static readonly string ConfigPathVarLine = $"[EnvVar]({ConfigPathVarName})";
+        private static readonly string ConfigPathVarLine = $"[EnvVar]({ProfilePathVarName})";
         private static readonly string SecureVaultPathVarLine = $"[EnvVar]({SecureVaultPathVarName})";
         private static readonly string SecureVaultPassVarLine = $"[EnvVar]({SecureVaultPassVarName})";
 
         private static readonly string BasicValidConfigFile = @$"
                                     templatePath={TemplatePath}
                                     resultPath={ResultPath}
-                                    configPath={ConfigPath}
+                                    profilePath={ProfilePath}
                                     secureVaultPath={SecureVaultPath}
                                     secureVaultPass={SecureVaultPass}";
 
@@ -53,7 +53,7 @@ namespace EnvironmentalistTests.Services.ConfigurationReader
         {
             { TemplatePathVarName, TemplatePathVarValue },
             { ResultPathVarName, ResultPathVarValue },
-            { ConfigPathVarName, ConfigPathVarValue },
+            { ProfilePathVarName, ProfilePathVarValue },
             { SecureVaultPathVarName, SecureVaultPathVarValue },
             { SecureVaultPassVarName, SecureVaultPassVarValue },
         };
@@ -62,7 +62,7 @@ namespace EnvironmentalistTests.Services.ConfigurationReader
         {
             TemplatePath = TemplatePathVarLine,
             ResultPath = ResultPathVarLine,
-            ConfigPath = ConfigPathVarLine,
+            ProfilePath = ConfigPathVarLine,
             SecureVaultPath = SecureVaultPathVarLine,
             SecureVaultPass = SecureVaultPassVarLine
         };
@@ -97,7 +97,7 @@ namespace EnvironmentalistTests.Services.ConfigurationReader
 
             Assert.AreEqual(TemplatePath, configuration.TemplatePath);
             Assert.AreEqual(ResultPath, configuration.ResultPath);
-            Assert.AreEqual(ConfigPath, configuration.ConfigPath);
+            Assert.AreEqual(ProfilePath, configuration.ProfilePath);
             Assert.AreEqual(SecureVaultPath, configuration.SecureVaultPath);
             Assert.AreEqual(SecureVaultPass, configuration.SecureVaultPass);
         }
@@ -126,7 +126,7 @@ namespace EnvironmentalistTests.Services.ConfigurationReader
             Assert.AreEqual(5, envVarList.Count);
             Assert.AreEqual(TemplatePathVarName, envVarList[0]);
             Assert.AreEqual(ResultPathVarName, envVarList[1]);
-            Assert.AreEqual(ConfigPathVarName, envVarList[2]);
+            Assert.AreEqual(ProfilePathVarName, envVarList[2]);
             Assert.AreEqual(SecureVaultPathVarName, envVarList[3]);
             Assert.AreEqual(SecureVaultPassVarName, envVarList[4]);
         }
@@ -146,7 +146,7 @@ namespace EnvironmentalistTests.Services.ConfigurationReader
 
             Assert.AreEqual(TemplatePathVarValue, processedConfig.TemplatePath);
             Assert.AreEqual(ResultPathVarValue, processedConfig.ResultPath);
-            Assert.AreEqual(ConfigPathVarValue, processedConfig.ConfigPath);
+            Assert.AreEqual(ProfilePathVarValue, processedConfig.ProfilePath);
             Assert.AreEqual(SecureVaultPathVarValue, processedConfig.SecureVaultPath);
             Assert.AreEqual(SecureVaultPassVarValue, processedConfig.SecureVaultPass);
         }
