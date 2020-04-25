@@ -32,7 +32,7 @@ namespace Environmentalist
 
             Log.Logger.Debug("Starting application");
 
-            RegisterServices();
+            RegisterTypes();
 
             if (args.Length == 0)
             {
@@ -80,24 +80,20 @@ namespace Environmentalist
             DisposeServices();
         }
 
-        private static void RegisterServices()
+        #region *** Register ***
+
+        private static void RegisterTypes()
         {
             var collection = new ServiceCollection();
             var builder = new ContainerBuilder();
 
             builder.RegisterType<FileSystem>().As<IFileSystem>().SingleInstance();
 
-            builder.RegisterType<FileValidator>().As<IFileValidator>().SingleInstance();
-            builder.RegisterType<ObjectValidator>().As<IObjectValidator>().SingleInstance();
-            builder.RegisterType<StringValidator>().As<IStringValidator>().SingleInstance();
+            RegisterValidators(builder);
 
             builder.RegisterType<DiskService>().As<IDiskService>().SingleInstance();
 
-            builder.RegisterType<TemplateReader>().As<ITemplateReader>().SingleInstance();
-            builder.RegisterType<ProfileReader>().As<IProfileReader>().SingleInstance();
-            builder.RegisterType<KeePassReader>().As<IKeePassReader>().SingleInstance();
-            builder.RegisterType<ConfigurationReader>().As<IConfigurationReader>().SingleInstance();
-            builder.RegisterType<EnvironmentVariableReader>().As<IEnvironmentVariableReader>().SingleInstance();
+            RegisterReaders(builder);
 
             builder.RegisterType<EnvWriter>().As<IEnvWriter>().SingleInstance();
             builder.RegisterType<LogicProcessor>().As<ILogicProcessor>().SingleInstance();
@@ -106,6 +102,24 @@ namespace Environmentalist
             var appContainer = builder.Build();
             _serviceProvider = new AutofacServiceProvider(appContainer);
         }
+
+        private static void RegisterValidators(ContainerBuilder builder)
+        {
+            builder.RegisterType<FileValidator>().As<IFileValidator>().SingleInstance();
+            builder.RegisterType<ObjectValidator>().As<IObjectValidator>().SingleInstance();
+            builder.RegisterType<StringValidator>().As<IStringValidator>().SingleInstance();
+        }
+
+        private static void RegisterReaders(ContainerBuilder builder)
+        {
+            builder.RegisterType<TemplateReader>().As<ITemplateReader>().SingleInstance();
+            builder.RegisterType<ProfileReader>().As<IProfileReader>().SingleInstance();
+            builder.RegisterType<KeePassReader>().As<IKeePassReader>().SingleInstance();
+            builder.RegisterType<ConfigurationReader>().As<IConfigurationReader>().SingleInstance();
+            builder.RegisterType<EnvironmentVariableReader>().As<IEnvironmentVariableReader>().SingleInstance();
+        }
+
+        #endregion *** Register ***
 
         private static void CreateLogger()
         {
