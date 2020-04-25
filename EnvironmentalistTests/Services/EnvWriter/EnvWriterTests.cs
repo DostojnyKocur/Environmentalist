@@ -17,7 +17,8 @@ namespace EnvironmentalistTests.Services.EnvWriter
         private const string Field2 = nameof(Field2);
         private const string Value1 = nameof(Value1);
         private const string Value2 = nameof(Value2);
-        private const string Path = "test path";
+        private const string ResultPath = "test path";
+        private const string TemplatePath = "test path";
 
         private Mock<IDiskService> _dickServiceModk;
         private Mock<IStringValidator> _stringValidatorMock;
@@ -38,22 +39,32 @@ namespace EnvironmentalistTests.Services.EnvWriter
         }
 
         [Test]
-        public async Task When_write_Then_writeto_file()
+        public async Task When_write_Then_write_to_file()
         {
             var model = PrepareTemplateModel();
+            _dickServiceModk.Setup(m => m.ReadFileText(TemplatePath)).ReturnsAsync(PrepareTemplateFileContent());
 
-            await _sut.Write(model, Path);
+            await _sut.Write(model, ResultPath, TemplatePath);
 
-            _dickServiceModk.Verify(m => m.WriteFileText(PrepareFileContent(), Path), Times.Once);
+            _dickServiceModk.Verify(m => m.WriteFileText(PrepareFileContent(), ResultPath), Times.Once);
         }
 
         [Test]
-        public void When_write_And_path_is_invalid_Then_throws_argument_null_exception()
+        public void When_write_And_output_path_is_invalid_Then_throws_argument_null_exception()
         {
             _stringValidatorMock.Setup(m => m.IsNullOrWhitespace(null, It.IsAny<string>())).Throws(new ArgumentNullException());
             var model = PrepareTemplateModel();
 
-            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Write(model, null));
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Write(model, null, TemplatePath));
+        }
+
+        [Test]
+        public void When_write_And_template_path_is_invalid_Then_throws_argument_null_exception()
+        {
+            _stringValidatorMock.Setup(m => m.IsNullOrWhitespace(null, It.IsAny<string>())).Throws(new ArgumentNullException());
+            var model = PrepareTemplateModel();
+
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Write(model, ResultPath, null));
         }
 
         [Test]
@@ -62,7 +73,7 @@ namespace EnvironmentalistTests.Services.EnvWriter
             _objectValidatorMock.Setup(m => m.IsNull(null, It.IsAny<string>())).Throws(new ArgumentNullException());
             var model = PrepareTemplateModel();
 
-            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Write(null, Path));
+            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.Write(null, ResultPath, TemplatePath));
         }
 
         private static TemplateModel PrepareTemplateModel()
@@ -76,7 +87,16 @@ namespace EnvironmentalistTests.Services.EnvWriter
 
         private static string PrepareFileContent()
         {
-            return $"{Field1}={Value1}{Environment.NewLine}{Field2}={Value2}{Environment.NewLine}";
+            return $@"
+                    {Field1}=     {Value1}{Environment.NewLine}
+                    {Field2}   = {Value2}{Environment.NewLine}";
+        }
+
+        private static string PrepareTemplateFileContent()
+        {
+            return $@"
+                    {Field1}=     placeholder1   {Environment.NewLine}
+                    {Field2}   = placeholder2 {Environment.NewLine}";
         }
     }
 }

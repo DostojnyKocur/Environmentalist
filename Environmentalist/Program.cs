@@ -67,7 +67,7 @@ namespace Environmentalist
                     var output = logicProcessor.Process(template, profile, envVariablesValues, kdbx);
 
                     var envWriter = _serviceProvider.GetService<IEnvWriter>();
-                    await envWriter.Write(output, configuration.ResultPath);
+                    await envWriter.Write(output, configuration.ResultPath, configuration.TemplatePath);
                 }
                 catch (Exception exception)
                 {
