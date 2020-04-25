@@ -17,10 +17,10 @@ namespace Environmentalist.Services.LogicProcessor
             _objectValidator = objectValidator;
         }
 
-        public TemplateModel Process(TemplateModel template, TemplateModel config, IDictionary<string, string> environmentVariables, ICollection<SecretEntryModel> secrets)
+        public TemplateModel Process(TemplateModel template, ProfileModel profile, IDictionary<string, string> environmentVariables, ICollection<SecretEntryModel> secrets)
         {
             _objectValidator.IsNull(template, nameof(template));
-            _objectValidator.IsNull(config, nameof(config));
+            _objectValidator.IsNull(profile, nameof(profile));
             _objectValidator.IsNull(environmentVariables, nameof(environmentVariables));
             _objectValidator.IsNull(secrets, nameof(secrets));
 
@@ -31,7 +31,7 @@ namespace Environmentalist.Services.LogicProcessor
                 foreach (var templateLine in template.Fields)
                 {
                     var key = templateLine.Key;
-                    var value = config.Fields.ContainsKey(templateLine.Value) ? config.Fields[templateLine.Value] : templateLine.Value;
+                    var value = profile.Fields.ContainsKey(templateLine.Value) ? profile.Fields[templateLine.Value] : templateLine.Value;
 
                     value = TryGetCustomValue(value, environmentVariables, secrets);
 

@@ -10,6 +10,7 @@ using Environmentalist.Services.EnvironmentVariableReader;
 using Environmentalist.Services.EnvWriter;
 using Environmentalist.Services.KeePassReader;
 using Environmentalist.Services.LogicProcessor;
+using Environmentalist.Services.ProfileReader;
 using Environmentalist.Services.TemplateReader;
 using Environmentalist.Validators.FileValidator;
 using Environmentalist.Validators.ObjectValidator;
@@ -52,9 +53,10 @@ namespace Environmentalist
 
                     var templateReader = _serviceProvider.GetService<ITemplateReader>();
                     var template = await templateReader.Read(configuration.TemplatePath);
-                    var profile = await templateReader.Read(configuration.ProfilePath);
+                    var profileReader = _serviceProvider.GetService<IProfileReader>();
+                    var profile = await profileReader.Read(configuration.ProfilePath);
                     var templateEnvVariables = templateReader.ExtractEnvironmentVariables(template);
-                    var configEnvVariables = templateReader.ExtractEnvironmentVariables(profile);
+                    var configEnvVariables = profileReader.ExtractEnvironmentVariables(profile);
                     var envVariables = templateEnvVariables.Concat(configEnvVariables).ToList();
                     var envVariablesValues = envVariablesReader.Read(envVariables);
 
@@ -92,6 +94,7 @@ namespace Environmentalist
             builder.RegisterType<DiskService>().As<IDiskService>().SingleInstance();
 
             builder.RegisterType<TemplateReader>().As<ITemplateReader>().SingleInstance();
+            builder.RegisterType<ProfileReader>().As<IProfileReader>().SingleInstance();
             builder.RegisterType<KeePassReader>().As<IKeePassReader>().SingleInstance();
             builder.RegisterType<ConfigurationReader>().As<IConfigurationReader>().SingleInstance();
             builder.RegisterType<EnvironmentVariableReader>().As<IEnvironmentVariableReader>().SingleInstance();

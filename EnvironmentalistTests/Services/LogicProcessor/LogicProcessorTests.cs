@@ -27,7 +27,7 @@ namespace EnvironmentalistTests.Services.LogicProcessor
         private static readonly string SecretKeyLine1 = $"{Consts.KeePassTagName}({SecretKey1})";
 
         private TemplateModel TemplateModel;
-        private TemplateModel TemplateConfig;
+        private ProfileModel TemplateProfile;
         private Dictionary<string, string> EnvironmentVariables;
         private List<SecretEntryModel> Secrets;
 
@@ -38,7 +38,7 @@ namespace EnvironmentalistTests.Services.LogicProcessor
         public void Init()
         {
             TemplateModel = new TemplateModel();
-            TemplateConfig = new TemplateModel();
+            TemplateProfile = new ProfileModel();
             EnvironmentVariables = new Dictionary<string, string>();
             Secrets = new List<SecretEntryModel>();
 
@@ -54,10 +54,10 @@ namespace EnvironmentalistTests.Services.LogicProcessor
             TemplateModel.Fields.Add(TemplateKey1, TemplateValue1);
             TemplateModel.Fields.Add(TemplateKey2, TemplateValue2);
 
-            TemplateConfig.Fields.Add(TemplateValue1, ConfigValue1);
-            TemplateConfig.Fields.Add(TemplateValue2, ConfigValue2);
+            TemplateProfile.Fields.Add(TemplateValue1, ConfigValue1);
+            TemplateProfile.Fields.Add(TemplateValue2, ConfigValue2);
 
-            var result = _sut.Process(TemplateModel, TemplateConfig, EnvironmentVariables, Secrets);
+            var result = _sut.Process(TemplateModel, TemplateProfile, EnvironmentVariables, Secrets);
 
             Assert.AreEqual(ConfigValue1, result.Fields[TemplateKey1]);
             Assert.AreEqual(ConfigValue2, result.Fields[TemplateKey2]);
@@ -69,12 +69,12 @@ namespace EnvironmentalistTests.Services.LogicProcessor
             TemplateModel.Fields.Add(TemplateKey1, EnvironmentVariableLine1);
             TemplateModel.Fields.Add(TemplateKey2, TemplateValue2);
 
-            TemplateConfig.Fields.Add(TemplateValue1, ConfigValue1);
-            TemplateConfig.Fields.Add(TemplateValue2, ConfigValue2);
+            TemplateProfile.Fields.Add(TemplateValue1, ConfigValue1);
+            TemplateProfile.Fields.Add(TemplateValue2, ConfigValue2);
 
             EnvironmentVariables.Add(EnvironmentVariableKey1, EnvironmentVariableValue1);
 
-            var result = _sut.Process(TemplateModel, TemplateConfig, EnvironmentVariables, Secrets);
+            var result = _sut.Process(TemplateModel, TemplateProfile, EnvironmentVariables, Secrets);
 
             Assert.AreEqual(EnvironmentVariableValue1, result.Fields[TemplateKey1]);
             Assert.AreEqual(ConfigValue2, result.Fields[TemplateKey2]);
@@ -86,8 +86,8 @@ namespace EnvironmentalistTests.Services.LogicProcessor
             TemplateModel.Fields.Add(TemplateKey1, SecretKeyLine1);
             TemplateModel.Fields.Add(TemplateKey2, TemplateValue2);
 
-            TemplateConfig.Fields.Add(TemplateValue1, ConfigValue1);
-            TemplateConfig.Fields.Add(TemplateValue2, ConfigValue2);
+            TemplateProfile.Fields.Add(TemplateValue1, ConfigValue1);
+            TemplateProfile.Fields.Add(TemplateValue2, ConfigValue2);
 
             Secrets.Add(new SecretEntryModel
                 {
@@ -95,7 +95,7 @@ namespace EnvironmentalistTests.Services.LogicProcessor
                     Password = SecretValue1
                 });
 
-            var result = _sut.Process(TemplateModel, TemplateConfig, EnvironmentVariables, Secrets);
+            var result = _sut.Process(TemplateModel, TemplateProfile, EnvironmentVariables, Secrets);
 
             Assert.AreEqual(SecretValue1, result.Fields[TemplateKey1]);
             Assert.AreEqual(ConfigValue2, result.Fields[TemplateKey2]);
@@ -106,7 +106,7 @@ namespace EnvironmentalistTests.Services.LogicProcessor
         {
             _objectValidatorMock.Setup(m => m.IsNull(null, It.IsAny<string>())).Throws(new ArgumentNullException());
 
-            Assert.Throws<ArgumentNullException>(() => _sut.Process(null, TemplateConfig, EnvironmentVariables, Secrets));
+            Assert.Throws<ArgumentNullException>(() => _sut.Process(null, TemplateProfile, EnvironmentVariables, Secrets));
         }
 
         [Test]
@@ -122,7 +122,7 @@ namespace EnvironmentalistTests.Services.LogicProcessor
         {
             _objectValidatorMock.Setup(m => m.IsNull(null, It.IsAny<string>())).Throws(new ArgumentNullException());
 
-            Assert.Throws<ArgumentNullException>(() => _sut.Process(TemplateModel, TemplateConfig, null, Secrets));
+            Assert.Throws<ArgumentNullException>(() => _sut.Process(TemplateModel, TemplateProfile, null, Secrets));
         }
 
         [Test]
@@ -130,7 +130,7 @@ namespace EnvironmentalistTests.Services.LogicProcessor
         {
             _objectValidatorMock.Setup(m => m.IsNull(null, It.IsAny<string>())).Throws(new ArgumentNullException());
 
-            Assert.Throws<ArgumentNullException>(() => _sut.Process(TemplateModel, TemplateConfig, EnvironmentVariables, null));
+            Assert.Throws<ArgumentNullException>(() => _sut.Process(TemplateModel, TemplateProfile, EnvironmentVariables, null));
         }
     }
 }
