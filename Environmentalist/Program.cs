@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Environmentalist.Services.ConfigurationReader;
+using Environmentalist.Services.ConfigurationRepository;
 using Environmentalist.Services.DiskService;
 using Environmentalist.Services.EnvironmentVariableReader;
 using Environmentalist.Services.EnvWriter;
@@ -43,14 +44,11 @@ namespace Environmentalist
                 try
                 {
                     var configFilePath = args[0];
-                    var configReader = _serviceProvider.GetService<IConfigurationReader>();
-                    var configuration = await configReader.Read(configFilePath);
-                    var configurationEnvVariables = configReader.ExtractEnvironmentVariables(configuration);
+
+                    var configurationRepository = _serviceProvider.GetService<IConfigurationRepository>();
+                    var configuration = await configurationRepository.GetConfiguration(configFilePath);
 
                     var envVariablesReader = _serviceProvider.GetService<IEnvironmentVariableReader>();
-                    var configEnvVariablesValues = envVariablesReader.Read(configurationEnvVariables);
-                    configuration = configReader.ProcessEnvironmentVariables(configuration, configEnvVariablesValues);
-
                     var templateReader = _serviceProvider.GetService<ITemplateReader>();
                     var template = await templateReader.Read(configuration.TemplatePath);
                     var profileReader = _serviceProvider.GetService<IProfileReader>();
@@ -87,16 +85,14 @@ namespace Environmentalist
             var collection = new ServiceCollection();
             var builder = new ContainerBuilder();
 
-            builder.RegisterType<FileSystem>().As<IFileSystem>().SingleInstance();
-
-            RegisterValidators(builder);
-
-            builder.RegisterType<DiskService>().As<IDiskService>().SingleInstance();
-
-            RegisterReaders(builder);
-
+            builder.RegisterType<FileSystem>().As<IFileSystem>().SingleInstance();       
+            builder.RegisterType<DiskService>().As<IDiskService>().SingleInstance();          
             builder.RegisterType<EnvWriter>().As<IEnvWriter>().SingleInstance();
             builder.RegisterType<LogicProcessor>().As<ILogicProcessor>().SingleInstance();
+            builder.RegisterType<ConfigurationRepository>().As<IConfigurationRepository>().SingleInstance();
+
+            RegisterValidators(builder);
+            RegisterReaders(builder);
 
             builder.Populate(collection);
             var appContainer = builder.Build();
