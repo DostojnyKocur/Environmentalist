@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Environmentalist.Extensions;
 using Environmentalist.Models;
 using Environmentalist.Services.DiskService;
 using Environmentalist.Validators.FileValidator;
-using Environmentalist.Validators.ObjectValidator;
 using Environmentalist.Validators.StringValidator;
 using Serilog;
 
@@ -17,18 +14,15 @@ namespace Environmentalist.Services.ConfigurationReader
         private readonly IDiskService _diskService;
         private readonly IFileValidator _fileValidator;
         private readonly IStringValidator _stringValidator;
-        private readonly IObjectValidator _objectValidator;
 
         public ConfigurationReader(
             IDiskService diskService,
             IFileValidator fileValidator,
-            IStringValidator stringValidator,
-            IObjectValidator objectValidator)
+            IStringValidator stringValidator)
         {
             _diskService = diskService;
             _fileValidator = fileValidator;
             _stringValidator = stringValidator;
-            _objectValidator = objectValidator;
         }
 
         public async Task<ConfigurationModel> Read(string path)
@@ -50,78 +44,6 @@ namespace Environmentalist.Services.ConfigurationReader
             });
 
             return result;
-        }
-
-        public ICollection<string> ExtractEnvironmentVariables(ConfigurationModel model)
-        {
-            _objectValidator.IsNull(model, nameof(model));
-
-            var foundEnvironmentVariables = new List<string>();
-                
-            if(model.TemplatePath.StartsWith(Consts.EnvironmentalVariableTagName))
-            {
-                foundEnvironmentVariables.Add(model.TemplatePath.GetBetweenParentheses());
-            }
-            if (model.ResultPath.StartsWith(Consts.EnvironmentalVariableTagName))
-            {
-                foundEnvironmentVariables.Add(model.ResultPath.GetBetweenParentheses());
-            }
-            if (model.ProfilePath.StartsWith(Consts.EnvironmentalVariableTagName))
-            {
-                foundEnvironmentVariables.Add(model.ProfilePath.GetBetweenParentheses());
-            }
-            if (model.SecureVaultPath.StartsWith(Consts.EnvironmentalVariableTagName))
-            {
-                foundEnvironmentVariables.Add(model.SecureVaultPath.GetBetweenParentheses());
-            }
-            if (model.SecureVaultPass.StartsWith(Consts.EnvironmentalVariableTagName))
-            {
-                foundEnvironmentVariables.Add(model.SecureVaultPass.GetBetweenParentheses());
-            }
-
-            return foundEnvironmentVariables;
-        }
-
-        public ConfigurationModel ProcessEnvironmentVariables(ConfigurationModel configuration, IDictionary<string, string> environmentVariables)
-        {
-            _objectValidator.IsNull(configuration, nameof(configuration));
-            _objectValidator.IsNull(environmentVariables, nameof(environmentVariables));
-
-            var newConfiguration = new ConfigurationModel
-            {
-                TemplatePath = TryGetEnvironmentVariableValue(configuration.TemplatePath, environmentVariables),
-                ResultPath = TryGetEnvironmentVariableValue(configuration.ResultPath, environmentVariables),
-                ProfilePath = TryGetEnvironmentVariableValue(configuration.ProfilePath, environmentVariables),
-                SecureVaultPath = TryGetEnvironmentVariableValue(configuration.SecureVaultPath, environmentVariables),
-                SecureVaultPass = TryGetEnvironmentVariableValue(configuration.SecureVaultPass, environmentVariables),
-            };
-
-            return newConfiguration;
-        }
-
-        private static string TryGetEnvironmentVariableValue(string field, IDictionary<string, string> environmentVariables)
-        {
-            if(!field.StartsWith(Consts.EnvironmentalVariableTagName))
-            {
-                return field;
-            }
-
-            if (!environmentVariables.Any())
-            {
-                throw new InvalidOperationException("No environment variables values found");
-            }
-
-            try
-            {
-                var environmentVariableName = field.GetBetweenParentheses();
-                var environmentVariableValue = environmentVariables[environmentVariableName];
-                return environmentVariableValue;
-            }
-            catch (KeyNotFoundException exception)
-            {
-                Log.Logger.Error(exception, $"Environment variable value for '{field}' has not been found");
-                throw;
-            }
         }
 
         private static void AssignConfigurationValue(ConfigurationModel config, string configLine)

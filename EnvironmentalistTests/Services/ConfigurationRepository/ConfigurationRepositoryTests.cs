@@ -5,6 +5,7 @@ using Environmentalist.Models;
 using Environmentalist.Services.ConfigurationReader;
 using Environmentalist.Services.ConfigurationRepository;
 using Environmentalist.Services.EnvironmentVariableReader;
+using Environmentalist.Validators.ObjectValidator;
 using Environmentalist.Validators.StringValidator;
 using Moq;
 using NUnit.Framework;
@@ -27,11 +28,6 @@ namespace EnvironmentalistTests.Services.ConfigurationRepository
         private static readonly string SecureVaultPathVarLine = $"[EnvVar]({SecureVaultPathVarName})";
         private static readonly string SecureVaultPassVarLine = $"[EnvVar]({SecureVaultPassVarName})";
 
-        private static readonly List<string> EnvVarList = new List<string>
-        {
-            SecureVaultPathVarName, SecureVaultPassVarName
-        };
-
         private static readonly Dictionary<string, string> EnvVarValues = new Dictionary<string, string>
         {
             { SecureVaultPathVarName, SecureVaultPathVarValue },
@@ -47,18 +43,10 @@ namespace EnvironmentalistTests.Services.ConfigurationRepository
             SecureVaultPass = SecureVaultPassVarLine
         };
 
-        private readonly ConfigurationModel FinalConfiguration = new ConfigurationModel
-        {
-            TemplatePath = TemplatePath,
-            ResultPath = ResultPath,
-            ProfilePath = ProfilePath,
-            SecureVaultPath = SecureVaultPathVarValue,
-            SecureVaultPass = SecureVaultPassVarValue
-        };
-
         private Mock<IConfigurationReader> _configurationReaderMock;
         private Mock<IEnvironmentVariableReader> _environmentVariableReaderMock;
         private Mock<IStringValidator> _stringValidatorMock;
+        private Mock<IObjectValidator> _objectValidatorMock;
         private IConfigurationRepository _sut;
 
         [SetUp]
@@ -67,19 +55,19 @@ namespace EnvironmentalistTests.Services.ConfigurationRepository
             _configurationReaderMock = new Mock<IConfigurationReader>();
             _environmentVariableReaderMock = new Mock<IEnvironmentVariableReader>();
             _stringValidatorMock = new Mock<IStringValidator>();
+            _objectValidatorMock = new Mock<IObjectValidator>();
 
             _sut = new Environmentalist.Services.ConfigurationRepository.ConfigurationRepository(
                 _configurationReaderMock.Object,
                 _environmentVariableReaderMock.Object,
-                _stringValidatorMock.Object);
+                _stringValidatorMock.Object,
+                _objectValidatorMock.Object);
         }
 
         [Test]
         public async Task When_get_configuration_Then_returns_configuration()
         {
             _configurationReaderMock.Setup(m => m.Read(Path)).ReturnsAsync(Configuration);
-            _configurationReaderMock.Setup(m => m.ExtractEnvironmentVariables(Configuration)).Returns(EnvVarList);
-            _configurationReaderMock.Setup(m => m.ProcessEnvironmentVariables(Configuration, EnvVarValues)).Returns(FinalConfiguration);
             _environmentVariableReaderMock.Setup(m => m.Read(It.IsAny<IEnumerable<string>>())).Returns(EnvVarValues);
 
             var result = await _sut.GetConfiguration(Path);
