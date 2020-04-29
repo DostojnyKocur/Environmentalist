@@ -15,7 +15,7 @@ namespace Environmentalist.Helpers
                 return field;
             }
 
-            if (!environmentVariables.Any())
+            if (environmentVariables is null || !environmentVariables.Any())
             {
                 throw new InvalidOperationException("No environment variables values found");
             }
