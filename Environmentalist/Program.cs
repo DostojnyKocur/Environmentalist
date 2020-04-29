@@ -11,6 +11,7 @@ using Environmentalist.Services.EnvWriter;
 using Environmentalist.Services.KeePassReader;
 using Environmentalist.Services.LogicProcessor;
 using Environmentalist.Services.ProfileReader;
+using Environmentalist.Services.ProfileRepository;
 using Environmentalist.Services.TemplateReader;
 using Environmentalist.Services.TemplateRepository;
 using Environmentalist.Validators.FileValidator;
@@ -51,20 +52,14 @@ namespace Environmentalist
                     var templateRepository = _serviceProvider.GetService<ITemplateRepository>();
                     var template = await templateRepository.GetTemplate(configuration.TemplatePath);
 
-                    var envVariablesReader = _serviceProvider.GetService<IEnvironmentVariableReader>();
-
-                    var profileReader = _serviceProvider.GetService<IProfileReader>();
-                    var profile = await profileReader.Read(configuration.ProfilePath);
-
-                    var configEnvVariables = profileReader.ExtractEnvironmentVariables(profile);
-
-                    var envVariablesValues = envVariablesReader.Read(configEnvVariables);
+                    var profileRepository = _serviceProvider.GetService<IProfileRepository>();
+                    var profile = await profileRepository.GetProfile(configuration.ProfilePath);
 
                     var reader = _serviceProvider.GetService<IKeePassReader>();
                     var kdbx = reader.ReadDatabase(configuration.SecureVaultPath, configuration.SecureVaultPass);
 
                     var logicProcessor = _serviceProvider.GetService<ILogicProcessor>();
-                    var output = logicProcessor.Process(template, profile, envVariablesValues, kdbx);
+                    var output = logicProcessor.Process(template, profile, kdbx);
 
                     var envWriter = _serviceProvider.GetService<IEnvWriter>();
                     await envWriter.Write(output, configuration.ResultPath, configuration.TemplatePath);
@@ -91,15 +86,21 @@ namespace Environmentalist
             builder.RegisterType<DiskService>().As<IDiskService>().SingleInstance();          
             builder.RegisterType<EnvWriter>().As<IEnvWriter>().SingleInstance();
             builder.RegisterType<LogicProcessor>().As<ILogicProcessor>().SingleInstance();
-            builder.RegisterType<ConfigurationRepository>().As<IConfigurationRepository>().SingleInstance();
-            builder.RegisterType<TemplateRepository>().As<ITemplateRepository>().SingleInstance();
 
+            RegisterRepositories(builder);
             RegisterValidators(builder);
             RegisterReaders(builder);
 
             builder.Populate(collection);
             var appContainer = builder.Build();
             _serviceProvider = new AutofacServiceProvider(appContainer);
+        }
+
+        private static void RegisterRepositories(ContainerBuilder builder)
+        {
+            builder.RegisterType<ConfigurationRepository>().As<IConfigurationRepository>().SingleInstance();
+            builder.RegisterType<TemplateRepository>().As<ITemplateRepository>().SingleInstance();
+            builder.RegisterType<ProfileRepository>().As<IProfileRepository>().SingleInstance();
         }
 
         private static void RegisterValidators(ContainerBuilder builder)

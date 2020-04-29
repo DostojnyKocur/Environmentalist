@@ -23,12 +23,10 @@ namespace EnvironmentalistTests.Services.LogicProcessor
         private const string SecretKey1 = nameof(SecretKey1);
         private const string SecretValue1 = nameof(SecretValue1);
 
-        private static readonly string EnvironmentVariableLine1 = $"{Consts.EnvironmentalVariableTagName}({EnvironmentVariableKey1})";
         private static readonly string SecretKeyLine1 = $"{Consts.KeePassTagName}({SecretKey1})";
 
         private TemplateModel TemplateModel;
         private ProfileModel TemplateProfile;
-        private Dictionary<string, string> EnvironmentVariables;
         private List<SecretEntryModel> Secrets;
 
         private Mock<IObjectValidator> _objectValidatorMock;
@@ -39,7 +37,6 @@ namespace EnvironmentalistTests.Services.LogicProcessor
         {
             TemplateModel = new TemplateModel();
             TemplateProfile = new ProfileModel();
-            EnvironmentVariables = new Dictionary<string, string>();
             Secrets = new List<SecretEntryModel>();
 
             _objectValidatorMock = new Mock<IObjectValidator>();
@@ -57,26 +54,9 @@ namespace EnvironmentalistTests.Services.LogicProcessor
             TemplateProfile.Fields.Add(TemplateValue1, ConfigValue1);
             TemplateProfile.Fields.Add(TemplateValue2, ConfigValue2);
 
-            var result = _sut.Process(TemplateModel, TemplateProfile, EnvironmentVariables, Secrets);
+            var result = _sut.Process(TemplateModel, TemplateProfile, Secrets);
 
             Assert.AreEqual(ConfigValue1, result.Fields[TemplateKey1]);
-            Assert.AreEqual(ConfigValue2, result.Fields[TemplateKey2]);
-        }
-
-        [Test]
-        public void When_process_And_template_contains_environment_variables_Then_returns_filled_model()
-        {
-            TemplateModel.Fields.Add(TemplateKey1, EnvironmentVariableLine1);
-            TemplateModel.Fields.Add(TemplateKey2, TemplateValue2);
-
-            TemplateProfile.Fields.Add(TemplateValue1, ConfigValue1);
-            TemplateProfile.Fields.Add(TemplateValue2, ConfigValue2);
-
-            EnvironmentVariables.Add(EnvironmentVariableKey1, EnvironmentVariableValue1);
-
-            var result = _sut.Process(TemplateModel, TemplateProfile, EnvironmentVariables, Secrets);
-
-            Assert.AreEqual(EnvironmentVariableValue1, result.Fields[TemplateKey1]);
             Assert.AreEqual(ConfigValue2, result.Fields[TemplateKey2]);
         }
 
@@ -95,7 +75,7 @@ namespace EnvironmentalistTests.Services.LogicProcessor
                     Password = SecretValue1
                 });
 
-            var result = _sut.Process(TemplateModel, TemplateProfile, EnvironmentVariables, Secrets);
+            var result = _sut.Process(TemplateModel, TemplateProfile, Secrets);
 
             Assert.AreEqual(SecretValue1, result.Fields[TemplateKey1]);
             Assert.AreEqual(ConfigValue2, result.Fields[TemplateKey2]);
@@ -106,7 +86,7 @@ namespace EnvironmentalistTests.Services.LogicProcessor
         {
             _objectValidatorMock.Setup(m => m.IsNull(null, It.IsAny<string>())).Throws(new ArgumentNullException());
 
-            Assert.Throws<ArgumentNullException>(() => _sut.Process(null, TemplateProfile, EnvironmentVariables, Secrets));
+            Assert.Throws<ArgumentNullException>(() => _sut.Process(null, TemplateProfile, Secrets));
         }
 
         [Test]
@@ -114,23 +94,16 @@ namespace EnvironmentalistTests.Services.LogicProcessor
         {
             _objectValidatorMock.Setup(m => m.IsNull(null, It.IsAny<string>())).Throws(new ArgumentNullException());
 
-            Assert.Throws<ArgumentNullException>(() => _sut.Process(TemplateModel, null, EnvironmentVariables, Secrets));
+            Assert.Throws<ArgumentNullException>(() => _sut.Process(TemplateModel, null, Secrets));
         }
 
-        [Test]
-        public void When_process_And_environment_variables_collection_is_null_Then_throws_argument_null_exception()
-        {
-            _objectValidatorMock.Setup(m => m.IsNull(null, It.IsAny<string>())).Throws(new ArgumentNullException());
-
-            Assert.Throws<ArgumentNullException>(() => _sut.Process(TemplateModel, TemplateProfile, null, Secrets));
-        }
 
         [Test]
         public void When_process_And_secrets_collection_is_null_Then_throws_argument_null_exception()
         {
             _objectValidatorMock.Setup(m => m.IsNull(null, It.IsAny<string>())).Throws(new ArgumentNullException());
 
-            Assert.Throws<ArgumentNullException>(() => _sut.Process(TemplateModel, TemplateProfile, EnvironmentVariables, null));
+            Assert.Throws<ArgumentNullException>(() => _sut.Process(TemplateModel, TemplateProfile, null));
         }
     }
 }
