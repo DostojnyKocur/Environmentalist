@@ -82,11 +82,9 @@ namespace Environmentalist
             var collection = new ServiceCollection();
             var builder = new ContainerBuilder();
 
-            builder.RegisterType<FileSystem>().As<IFileSystem>().SingleInstance();       
-            builder.RegisterType<DiskService>().As<IDiskService>().SingleInstance();          
-            builder.RegisterType<EnvWriter>().As<IEnvWriter>().SingleInstance();
-            builder.RegisterType<LogicProcessor>().As<ILogicProcessor>().SingleInstance();
-
+            RegisterInfrastructure(builder);
+            RegisterWriters(builder);
+            RegisterLogics(builder);
             RegisterRepositories(builder);
             RegisterValidators(builder);
             RegisterReaders(builder);
@@ -94,6 +92,22 @@ namespace Environmentalist
             builder.Populate(collection);
             var appContainer = builder.Build();
             _serviceProvider = new AutofacServiceProvider(appContainer);
+        }
+
+        private static void RegisterInfrastructure(ContainerBuilder builder)
+        {
+            builder.RegisterType<FileSystem>().As<IFileSystem>().SingleInstance();
+            builder.RegisterType<DiskService>().As<IDiskService>().SingleInstance();
+        }
+
+        private static void RegisterWriters(ContainerBuilder builder)
+        {
+            builder.RegisterType<EnvWriter>().As<IEnvWriter>().SingleInstance();
+        }
+
+        private static void RegisterLogics(ContainerBuilder builder)
+        {
+            builder.RegisterType<LogicProcessor>().As<ILogicProcessor>().SingleInstance();
         }
 
         private static void RegisterRepositories(ContainerBuilder builder)
