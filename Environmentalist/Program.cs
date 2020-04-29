@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO.Abstractions;
-using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -13,6 +12,7 @@ using Environmentalist.Services.KeePassReader;
 using Environmentalist.Services.LogicProcessor;
 using Environmentalist.Services.ProfileReader;
 using Environmentalist.Services.TemplateReader;
+using Environmentalist.Services.TemplateRepository;
 using Environmentalist.Validators.FileValidator;
 using Environmentalist.Validators.ObjectValidator;
 using Environmentalist.Validators.StringValidator;
@@ -48,15 +48,17 @@ namespace Environmentalist
                     var configurationRepository = _serviceProvider.GetService<IConfigurationRepository>();
                     var configuration = await configurationRepository.GetConfiguration(configFilePath);
 
+                    var templateRepository = _serviceProvider.GetService<ITemplateRepository>();
+                    var template = await templateRepository.GetTemplate(configuration.TemplatePath);
+
                     var envVariablesReader = _serviceProvider.GetService<IEnvironmentVariableReader>();
-                    var templateReader = _serviceProvider.GetService<ITemplateReader>();
-                    var template = await templateReader.Read(configuration.TemplatePath);
+
                     var profileReader = _serviceProvider.GetService<IProfileReader>();
                     var profile = await profileReader.Read(configuration.ProfilePath);
-                    var templateEnvVariables = templateReader.ExtractEnvironmentVariables(template);
+
                     var configEnvVariables = profileReader.ExtractEnvironmentVariables(profile);
-                    var envVariables = templateEnvVariables.Concat(configEnvVariables).ToList();
-                    var envVariablesValues = envVariablesReader.Read(envVariables);
+
+                    var envVariablesValues = envVariablesReader.Read(configEnvVariables);
 
                     var reader = _serviceProvider.GetService<IKeePassReader>();
                     var kdbx = reader.ReadDatabase(configuration.SecureVaultPath, configuration.SecureVaultPass);
@@ -90,6 +92,7 @@ namespace Environmentalist
             builder.RegisterType<EnvWriter>().As<IEnvWriter>().SingleInstance();
             builder.RegisterType<LogicProcessor>().As<ILogicProcessor>().SingleInstance();
             builder.RegisterType<ConfigurationRepository>().As<IConfigurationRepository>().SingleInstance();
+            builder.RegisterType<TemplateRepository>().As<ITemplateRepository>().SingleInstance();
 
             RegisterValidators(builder);
             RegisterReaders(builder);
