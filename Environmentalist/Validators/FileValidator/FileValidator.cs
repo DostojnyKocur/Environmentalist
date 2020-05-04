@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Abstractions;
 
 namespace Environmentalist.Validators.FileValidator
@@ -14,11 +15,18 @@ namespace Environmentalist.Validators.FileValidator
 
         public void IsExist(string path)
         {
-            if(string.IsNullOrWhiteSpace(path) || !_fileSystem.File.Exists(path))
+            if(!_fileSystem.File.Exists(path))
             {
                 throw new FileNotFoundException(path);
             }
-            
+        }
+
+        public void IsNotExist(string path)
+        {
+            if (_fileSystem.File.Exists(path))
+            {
+                throw new ArgumentException($"File {path} already exists");
+            }
         }
     }
 }

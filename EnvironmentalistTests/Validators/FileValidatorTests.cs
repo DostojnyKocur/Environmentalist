@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
@@ -37,6 +38,18 @@ namespace EnvironmentalistTests.Validators
         public void When_is_exist_And_file_is_not_exist_Then_throws_file_not_found_exception()
         {
             Assert.Throws<FileNotFoundException>(() => _sut.IsExist(InvalidFilePath));
+        }
+
+        [Test]
+        public void When_is_not_exist_And_file_exists_Then_throws_argument_exception() 
+        {
+            Assert.Throws<ArgumentException>(() => _sut.IsNotExist(ValidFilePath));
+        }
+
+        [Test]
+        public void When_is_not_exist_And_file_is_not_exist_Then_does_not_throw_any_exception()
+        {
+            Assert.DoesNotThrow(() => _sut.IsNotExist(InvalidFilePath));
         }
     }
 }

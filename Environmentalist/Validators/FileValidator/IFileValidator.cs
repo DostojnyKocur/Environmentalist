@@ -3,5 +3,6 @@
     public interface IFileValidator
     {
         void IsExist(string path);
+        void IsNotExist(string path);
     }
 }
