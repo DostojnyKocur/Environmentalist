@@ -16,7 +16,6 @@ namespace EnvironmentalistTests.Services.DiskService
     public class DiskServiceTests
     {
         private const string ValidFilePath = @"test/path";
-        private const string ValidNewFilePath = @"test/path";
         private const string FileContent = "SomeFile SomeContent 42";
         private const string FileNewContent = "SomeNewFile SomeNewContent 42";
 
