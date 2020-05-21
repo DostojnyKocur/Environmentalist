@@ -70,6 +70,14 @@ namespace Environmentalist.Services.Repositories.ConfigurationRepository
             {
                 foundEnvironmentVariables.Add(model.SecureVaultPass.GetBetweenParentheses());
             }
+            if (model.ProtectedFilePath.StartsWith(Consts.EnvironmentalVariableTagName))
+            {
+                foundEnvironmentVariables.Add(model.ProtectedFilePath.GetBetweenParentheses());
+            }
+            if (model.ProtectedFileEntropy.StartsWith(Consts.EnvironmentalVariableTagName))
+            {
+                foundEnvironmentVariables.Add(model.ProtectedFileEntropy.GetBetweenParentheses());
+            }
 
             return foundEnvironmentVariables;
         }
@@ -86,6 +94,8 @@ namespace Environmentalist.Services.Repositories.ConfigurationRepository
                 ProfilePath = EnvironmentVariableHelper.TryGetEnvironmentVariableValueForField(configuration.ProfilePath, environmentVariables),
                 SecureVaultPath = EnvironmentVariableHelper.TryGetEnvironmentVariableValueForField(configuration.SecureVaultPath, environmentVariables),
                 SecureVaultPass = EnvironmentVariableHelper.TryGetEnvironmentVariableValueForField(configuration.SecureVaultPass, environmentVariables),
+                ProtectedFilePath = EnvironmentVariableHelper.TryGetEnvironmentVariableValueForField(configuration.ProtectedFilePath, environmentVariables),
+                ProtectedFileEntropy = EnvironmentVariableHelper.TryGetEnvironmentVariableValueForField(configuration.ProtectedFileEntropy, environmentVariables),
             };
 
             return newConfiguration;

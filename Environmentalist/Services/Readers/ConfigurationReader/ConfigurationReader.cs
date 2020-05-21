@@ -69,6 +69,20 @@ namespace Environmentalist.Services.Readers.ConfigurationReader
                 case "securevaultpass":
                     config.SecureVaultPass = value;
                     break;
+                case "protectedfilepath":
+                    config.ProtectedFilePath = value;
+                    break;
+                case "protectedfileentropy":
+                    if(keyValue.Length > 2) // In additional cells are '==' from the end of base64 string
+                    {
+                        config.ProtectedFileEntropy = $"{value}==";
+                    }
+                    else
+                    {
+                        config.ProtectedFileEntropy = value;
+                    }
+                    
+                    break;
                 default:
                     Log.Logger.Warning($"Unknown configuration key '{key}'. Value will be ignored");
                     break;

@@ -21,6 +21,8 @@ namespace EnvironmentalistTests.Services.Repositories.ConfigurationRepository
         private const string ProfilePath = "profile.txt";
         private const string SecureVaultPathVarName = "keepass";
         private const string SecureVaultPassVarName = "pass";
+        private const string ProtectedFilePath = "protected.txt";
+        private const string ProtectedFileEntropy = "entropy==";
 
         private const string SecureVaultPathVarValue = nameof(SecureVaultPathVarValue);
         private const string SecureVaultPassVarValue = nameof(SecureVaultPassVarValue);
@@ -40,7 +42,9 @@ namespace EnvironmentalistTests.Services.Repositories.ConfigurationRepository
             ResultPath = ResultPath,
             ProfilePath = ProfilePath,
             SecureVaultPath = SecureVaultPathVarLine,
-            SecureVaultPass = SecureVaultPassVarLine
+            SecureVaultPass = SecureVaultPassVarLine,
+            ProtectedFilePath = ProtectedFilePath,
+            ProtectedFileEntropy = ProtectedFileEntropy
         };
 
         private Mock<IConfigurationReader> _configurationReaderMock;
@@ -78,6 +82,8 @@ namespace EnvironmentalistTests.Services.Repositories.ConfigurationRepository
             Assert.AreEqual(ProfilePath, result.ProfilePath);
             Assert.AreEqual(SecureVaultPathVarValue, result.SecureVaultPath);
             Assert.AreEqual(SecureVaultPassVarValue, result.SecureVaultPass);
+            Assert.AreEqual(ProtectedFilePath, result.ProtectedFilePath);
+            Assert.AreEqual(ProtectedFileEntropy, result.ProtectedFileEntropy);
         }
 
         [Test]

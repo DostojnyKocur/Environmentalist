@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Environmentalist.Models
+﻿namespace Environmentalist.Models
 {
     public sealed class ConfigurationModel
     {
@@ -9,5 +7,7 @@ namespace Environmentalist.Models
         public string ProfilePath { get; set; }
         public string SecureVaultPath { get; set; }
         public string SecureVaultPass { get; set; }
+        public string ProtectedFilePath { get; set; }
+        public string ProtectedFileEntropy { get; set; }
     }
 }
