@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Environmentalist.Extensions;
+using Environmentalist.Helpers;
 using Environmentalist.Models;
 using Environmentalist.Services.DiskService;
 using Environmentalist.Validators.FileValidator;
@@ -36,18 +34,9 @@ namespace Environmentalist.Services.Readers.TemplateReader
 			_fileValidator.IsExist(path);
 
 			var fileContent = await _diskService.ReadFileText(path);
-			var lines = fileContent.Split(Environment.NewLine).ToList();
+			var fields = ProcessFileHelper.ProcessContent(fileContent);
 
-			var result = new TemplateModel();
-
-			lines.ForEach(line =>
-			{
-				if (!string.IsNullOrWhiteSpace(line))
-				{
-					var keyValue = line.Split('=');
-					result.Fields.Add(keyValue[0].Trim(), keyValue[1].Trim());
-				}
-			});
+			var result = new TemplateModel(fields);
 
 			return result;
 		}
@@ -56,10 +45,7 @@ namespace Environmentalist.Services.Readers.TemplateReader
 		{
 			_objectValidator.IsNull(model, nameof(model));
 
-			var foundEnvironmentVariables = model.Fields
-				.Where(keyPair => keyPair.Value.StartsWith(Consts.EnvironmentalVariableTagName))
-				.Select(keyPair => keyPair.Value.GetBetweenParentheses())
-				.ToList();
+			var foundEnvironmentVariables = ProcessFileHelper.ExtractEnvironmentVariables(model.Fields);
 
 			return foundEnvironmentVariables;
 		}
