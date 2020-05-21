@@ -38,6 +38,10 @@ namespace Environmentalist.Services.EnvWriter
             {
                 var indexOfKey = orifinalFileContent.IndexOf(keyValue.Key);
                 var indexOfEndLine = orifinalFileContent.IndexOf(Environment.NewLine, indexOfKey);
+                if(indexOfEndLine == -1)
+                {
+                    indexOfEndLine = orifinalFileContent.Length;
+                }
                 var charactersToCheck = indexOfEndLine - indexOfKey;
                 var indexOfAssign = orifinalFileContent.IndexOf(AssignChar, indexOfKey, charactersToCheck);
                 var indexOffirstCharacter = GetFirstNonWhitespace(orifinalFileContent, indexOfAssign, indexOfEndLine);
