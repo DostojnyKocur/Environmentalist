@@ -1,27 +1,27 @@
 ﻿using System;
-using Environmentalist.Services.PbkdF2Service;
+using Environmentalist.Services.Pbkdf2Service;
 using Environmentalist.Validators.StringValidator;
 using Moq;
 using NUnit.Framework;
 
-namespace EnvironmentalistTests.Services.PbkdF2Service
+namespace EnvironmentalistTests.Services.Pbkdf2Service
 {
     [TestFixture]
-    public class PbkdF2ServiceTests
+    public class Pbkdf2ServiceTests
     {
         private const string Plaintext = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis ante ante, lobortis quis mollis ut, fringilla volutpat nisi. Proin facilisis posuere sollicitudin. Nullam imperdiet ut lacus vel commodo. Nulla facilisi. Proin in eleifend orci, id vehicula leo. Donec quam eros, euismod accumsan nisi sed, commodo varius massa. Vestibulum vel feugiat ante.";
         private const string Ciphertext = "cipher text";
         private const string Entropy = "entropy";
 
         private Mock<IStringValidator> _stringValidatorMock;
-        private IPbkdF2Service _sut;
+        private IPbkdf2Service _sut;
 
         [SetUp]
         public void Init()
         {
             _stringValidatorMock = new Mock<IStringValidator>();
 
-            _sut = new Environmentalist.Services.PbkdF2Service.PbkdF2Service(
+            _sut = new Environmentalist.Services.Pbkdf2Service.Pbkdf2Service(
                 _stringValidatorMock.Object);
         }
 

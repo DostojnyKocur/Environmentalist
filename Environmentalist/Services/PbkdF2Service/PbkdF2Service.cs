@@ -2,13 +2,13 @@
 using System.Text;
 using Environmentalist.Validators.StringValidator;
 
-namespace Environmentalist.Services.PbkdF2Service
+namespace Environmentalist.Services.Pbkdf2Service
 {
-    public sealed class PbkdF2Service : IPbkdF2Service
+    public sealed class Pbkdf2Service : IPbkdf2Service
     {
         private readonly IStringValidator _stringValidator;
 
-        public PbkdF2Service(IStringValidator stringValidator)
+        public Pbkdf2Service(IStringValidator stringValidator)
         {
             _stringValidator = stringValidator;
         }

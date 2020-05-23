@@ -17,10 +17,11 @@ namespace Environmentalist.Services.LogicProcessor
             _objectValidator = objectValidator;
         }
 
-        public TemplateModel Process(TemplateModel template, ProfileModel profile, ICollection<SecretEntryModel> secrets)
+        public TemplateModel Process(TemplateModel template, ProfileModel profile, Pbkdf2Model protectedFile, ICollection<SecretEntryModel> secrets)
         {
             _objectValidator.IsNull(template, nameof(template));
             _objectValidator.IsNull(profile, nameof(profile));
+            _objectValidator.IsNull(protectedFile, nameof(protectedFile));
             _objectValidator.IsNull(secrets, nameof(secrets));
 
             var resultModel = new TemplateModel();
@@ -30,9 +31,7 @@ namespace Environmentalist.Services.LogicProcessor
                 foreach (var templateLine in template.Fields)
                 {
                     var key = templateLine.Key;
-                    var value = profile.Fields.ContainsKey(templateLine.Value) ? profile.Fields[templateLine.Value] : templateLine.Value;
-
-                    value = TryGetCustomValue(value, secrets);
+                    var value = TryGetValue(templateLine.Value, template, profile, protectedFile, secrets);
 
                     resultModel.Fields.Add(key, value);
 
@@ -46,6 +45,19 @@ namespace Environmentalist.Services.LogicProcessor
             }
 
             return resultModel;
+        }
+
+        private static string TryGetValue(string value, TemplateModel template, ProfileModel profile, Pbkdf2Model protectedFile, ICollection<SecretEntryModel> secrets)
+        {
+            var foundValue = profile.Fields.ContainsKey(value)
+                ? profile.Fields[value]
+                : (protectedFile.Fields.ContainsKey(value)
+                ? protectedFile.Fields[value]
+                : value);
+
+            foundValue = TryGetCustomValue(foundValue, secrets);
+
+            return foundValue;
         }
 
         private static string TryGetCustomValue(string value, ICollection<SecretEntryModel> secrets)

@@ -6,12 +6,14 @@ using Autofac.Extensions.DependencyInjection;
 using Environmentalist.Services.DiskService;
 using Environmentalist.Services.EnvWriter;
 using Environmentalist.Services.LogicProcessor;
+using Environmentalist.Services.Pbkdf2Service;
 using Environmentalist.Services.Readers.ConfigurationReader;
 using Environmentalist.Services.Readers.EnvironmentVariableReader;
 using Environmentalist.Services.Readers.KeePassReader;
 using Environmentalist.Services.Readers.ProfileReader;
 using Environmentalist.Services.Readers.TemplateReader;
 using Environmentalist.Services.Repositories.ConfigurationRepository;
+using Environmentalist.Services.Repositories.Pbkdf2Repository;
 using Environmentalist.Services.Repositories.ProfileRepository;
 using Environmentalist.Services.Repositories.TemplateRepository;
 using Environmentalist.Validators.FileValidator;
@@ -25,7 +27,7 @@ namespace Environmentalist
 {
     class Program
     {
-        private const string Usage = @"Usage: Environmentalist <path to config file .conf>";
+        private const string Usage = @"Usage: Environmentalist <path to config file .conf> or Environmentalist --encrypt <input file> <output file>";
         private static IServiceProvider _serviceProvider;
 
         static async Task Main(string[] args)
@@ -44,25 +46,19 @@ namespace Environmentalist
             {
                 try
                 {
-                    var configFilePath = args[0];
+                    if (args.Length == 1)
+                    {
+                        var configFilePath = args[0];
 
-                    var configurationRepository = _serviceProvider.GetService<IConfigurationRepository>();
-                    var configuration = await configurationRepository.GetConfiguration(configFilePath);
+                        await PrepareConfiguration(configFilePath);
+                    }
+                    else if (args.Length == 3)
+                    {
+                        var sourcePath = args[1];
+                        var outputPath = args[2];
 
-                    var templateRepository = _serviceProvider.GetService<ITemplateRepository>();
-                    var template = await templateRepository.GetTemplate(configuration.TemplatePath);
-
-                    var profileRepository = _serviceProvider.GetService<IProfileRepository>();
-                    var profile = await profileRepository.GetProfile(configuration.ProfilePath);
-
-                    var reader = _serviceProvider.GetService<IKeePassReader>();
-                    var kdbx = reader.ReadDatabase(configuration.SecureVaultPath, configuration.SecureVaultPass);
-
-                    var logicProcessor = _serviceProvider.GetService<ILogicProcessor>();
-                    var output = logicProcessor.Process(template, profile, kdbx);
-
-                    var envWriter = _serviceProvider.GetService<IEnvWriter>();
-                    await envWriter.Write(output, configuration.ResultPath, configuration.TemplatePath);
+                        await EncryptFile(sourcePath, outputPath);
+                    }
                 }
                 catch (Exception exception)
                 {
@@ -73,6 +69,36 @@ namespace Environmentalist
             Log.Logger.Debug("Terminating application");
 
             DisposeServices();
+        }
+
+        private static async Task PrepareConfiguration(string configFilePath)
+        {
+            var configurationRepository = _serviceProvider.GetService<IConfigurationRepository>();
+            var configuration = await configurationRepository.GetConfiguration(configFilePath);
+
+            var templateRepository = _serviceProvider.GetService<ITemplateRepository>();
+            var template = await templateRepository.GetTemplate(configuration.TemplatePath);
+
+            var profileRepository = _serviceProvider.GetService<IProfileRepository>();
+            var profile = await profileRepository.GetProfile(configuration.ProfilePath);
+
+            var pbkdf2Repository = _serviceProvider.GetService<IPbkdf2Repository>();
+            var protectedFile = await pbkdf2Repository.Decrypt(configuration.ProtectedFilePath, configuration.ProtectedFileEntropy);
+
+            var reader = _serviceProvider.GetService<IKeePassReader>();
+            var kdbx = reader.ReadDatabase(configuration.SecureVaultPath, configuration.SecureVaultPass);
+
+            var logicProcessor = _serviceProvider.GetService<ILogicProcessor>();
+            var output = logicProcessor.Process(template, profile, protectedFile, kdbx);
+
+            var envWriter = _serviceProvider.GetService<IEnvWriter>();
+            await envWriter.Write(output, configuration.ResultPath, configuration.TemplatePath);
+        }
+
+        private static async Task EncryptFile(string sourcePath, string outputPath)
+        {
+            var pbkdf2Repository = _serviceProvider.GetService<IPbkdf2Repository>();
+            await pbkdf2Repository.Encrypt(sourcePath, outputPath);
         }
 
         #region *** Register ***
@@ -98,6 +124,7 @@ namespace Environmentalist
         {
             builder.RegisterType<FileSystem>().As<IFileSystem>().SingleInstance();
             builder.RegisterType<DiskService>().As<IDiskService>().SingleInstance();
+            builder.RegisterType<Pbkdf2Service>().As<IPbkdf2Service>().SingleInstance();
         }
 
         private static void RegisterWriters(ContainerBuilder builder)
@@ -115,6 +142,7 @@ namespace Environmentalist
             builder.RegisterType<ConfigurationRepository>().As<IConfigurationRepository>().SingleInstance();
             builder.RegisterType<TemplateRepository>().As<ITemplateRepository>().SingleInstance();
             builder.RegisterType<ProfileRepository>().As<IProfileRepository>().SingleInstance();
+            builder.RegisterType<Pbkdf2Repository>().As<IPbkdf2Repository>().SingleInstance();
         }
 
         private static void RegisterValidators(ContainerBuilder builder)

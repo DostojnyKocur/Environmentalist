@@ -20,7 +20,7 @@ namespace EnvironmentalistTests.Services.EnvWriter
         private const string ResultPath = "test path";
         private const string TemplatePath = "test path";
 
-        private Mock<IDiskService> _dickServiceModk;
+        private Mock<IDiskService> _dickServiceMock;
         private Mock<IStringValidator> _stringValidatorMock;
         private Mock<IObjectValidator> _objectValidatorMock;
         private IEnvWriter _sut;
@@ -28,12 +28,12 @@ namespace EnvironmentalistTests.Services.EnvWriter
         [SetUp]
         public void Init()
         {
-            _dickServiceModk = new Mock<IDiskService>();
+            _dickServiceMock = new Mock<IDiskService>();
             _stringValidatorMock = new Mock<IStringValidator>();
             _objectValidatorMock = new Mock<IObjectValidator>();
 
             _sut = new Environmentalist.Services.EnvWriter.EnvWriter(
-                _dickServiceModk.Object,
+                _dickServiceMock.Object,
                 _stringValidatorMock.Object,
                 _objectValidatorMock.Object);
         }
@@ -42,11 +42,11 @@ namespace EnvironmentalistTests.Services.EnvWriter
         public async Task When_write_Then_write_to_file()
         {
             var model = PrepareTemplateModel();
-            _dickServiceModk.Setup(m => m.ReadFileText(TemplatePath)).ReturnsAsync(PrepareTemplateFileContent());
+            _dickServiceMock.Setup(m => m.ReadFileText(TemplatePath)).ReturnsAsync(PrepareTemplateFileContent());
 
             await _sut.Write(model, ResultPath, TemplatePath);
 
-            _dickServiceModk.Verify(m => m.WriteFileText(PrepareFileContent(), ResultPath), Times.Once);
+            _dickServiceMock.Verify(m => m.WriteFileText(PrepareFileContent(), ResultPath), Times.Once);
         }
 
         [Test]
