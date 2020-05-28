@@ -16,6 +16,7 @@ using Environmentalist.Services.Repositories.ConfigurationRepository;
 using Environmentalist.Services.Repositories.Pbkdf2Repository;
 using Environmentalist.Services.Repositories.ProfileRepository;
 using Environmentalist.Services.Repositories.TemplateRepository;
+using Environmentalist.Validators;
 using Environmentalist.Validators.FileValidator;
 using Environmentalist.Validators.ObjectValidator;
 using Environmentalist.Validators.StringValidator;
@@ -150,6 +151,7 @@ namespace Environmentalist
             builder.RegisterType<FileValidator>().As<IFileValidator>().SingleInstance();
             builder.RegisterType<ObjectValidator>().As<IObjectValidator>().SingleInstance();
             builder.RegisterType<StringValidator>().As<IStringValidator>().SingleInstance();
+            builder.RegisterType<Validators.Validators>().As<IValidators>().SingleInstance();
         }
 
         private static void RegisterReaders(ContainerBuilder builder)
